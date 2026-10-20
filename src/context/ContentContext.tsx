@@ -41,6 +41,13 @@ const ContentContext = createContext<ContentContextType | undefined>(undefined);
 const LOCAL_STORAGE_KEY = "clericlabs_content_cards_v1";
 const TASKS_STORAGE_KEY = "clericlabs_tasks_v1";
 
+const getLocalDateStr = (d = new Date()) => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 const DEFAULT_STARTER_TASKS: TaskItem[] = [
   {
     id: "task-1",
@@ -48,8 +55,8 @@ const DEFAULT_STARTER_TASKS: TaskItem[] = [
     status: "todo",
     priority: "High",
     contentType: "IG Carousel",
-    dueDate: "2026-10-21",
-    createdAt: "2026-10-20",
+    dueDate: getLocalDateStr(),
+    createdAt: getLocalDateStr(),
   },
   {
     id: "task-2",
@@ -57,25 +64,25 @@ const DEFAULT_STARTER_TASKS: TaskItem[] = [
     status: "in_progress",
     priority: "High",
     contentType: "IG Reel · Standard",
-    dueDate: "2026-10-21",
-    createdAt: "2026-10-20",
+    dueDate: getLocalDateStr(),
+    createdAt: getLocalDateStr(),
   },
   {
     id: "task-3",
     title: "Batch research 10 viral hooks for Q4 newsletter",
     status: "todo",
     priority: "Medium",
-    dueDate: "2026-10-23",
-    createdAt: "2026-10-20",
+    dueDate: getLocalDateStr(),
+    createdAt: getLocalDateStr(),
   },
   {
     id: "task-4",
     title: "Audit top-performing Reels & Carousels of September",
     status: "done",
     priority: "Low",
-    dueDate: "2026-10-19",
-    createdAt: "2026-10-18",
-    completedAt: "2026-10-19",
+    dueDate: getLocalDateStr(),
+    createdAt: getLocalDateStr(),
+    completedAt: getLocalDateStr(),
   },
 ];
 
@@ -270,6 +277,7 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
   );
 
   const addTask = useCallback((taskData: Partial<TaskItem>) => {
+    const localToday = getLocalDateStr();
     const newTask: TaskItem = {
       id: "task-" + Date.now(),
       title: taskData.title || "Untitled Task",
@@ -279,8 +287,8 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
       contentCardTitle: taskData.contentCardTitle,
       contentType: taskData.contentType,
       assignee: taskData.assignee || "Unassigned",
-      dueDate: taskData.dueDate,
-      createdAt: new Date().toISOString().split("T")[0],
+      dueDate: taskData.dueDate || localToday,
+      createdAt: localToday,
       ...taskData,
     };
 

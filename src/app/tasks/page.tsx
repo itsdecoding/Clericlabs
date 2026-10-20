@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import Link from "next/link";
 import {
   CheckSquare,
@@ -22,6 +22,8 @@ import {
   Kanban,
   ListTodo,
   FolderGit2,
+  X,
+  User,
 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useContent } from "@/context/ContentContext";
@@ -29,6 +31,14 @@ import { TaskItem, ContentCard } from "@/data/mockData";
 
 type ViewMode = "List" | "ByContent" | "Kanban";
 type FilterType = "All" | "Urgent" | "Content" | "StudioOps" | "Completed";
+
+// Helper for local YYYY-MM-DD string (avoids UTC timezone shift)
+const getLocalDateStr = (d = new Date()) => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
 
 export default function TasksPage() {
   const { cards, tasks, addTask, toggleTaskStatus, updateTask, deleteTask } =
@@ -38,25 +48,39 @@ export default function TasksPage() {
   const [filterType, setFilterType] = useState<FilterType>("All");
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Quick Add State
+  // Input ref for auto-focusing
+  const quickInputRef = useRef<HTMLInputElement>(null);
+
+  // Dedicated Create Task Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalPriority, setModalPriority] = useState<"High" | "Medium" | "Low">("Medium");
+  const [modalCardId, setModalCardId] = useState("");
+  const [modalDueDate, setModalDueDate] = useState(() => getLocalDateStr());
+  const [modalAssignee, setModalAssignee] = useState("Muzammil");
+
+  // Inline Quick Add State
   const [quickTitle, setQuickTitle] = useState("");
   const [quickPriority, setQuickPriority] = useState<"High" | "Medium" | "Low">("Medium");
   const [quickCardId, setQuickCardId] = useState("");
-  const [quickDueDate, setQuickDueDate] = useState(() => {
-    return new Date().toISOString().split("T")[0];
-  });
+  const [quickDueDate, setQuickDueDate] = useState(() => getLocalDateStr());
   const [isQuickAddExpanded, setIsQuickAddExpanded] = useState(false);
 
   // Collapsed sections in List view
   const [isCompletedOpen, setIsCompletedOpen] = useState(false);
 
-  // Today string
-  const todayStr = useMemo(() => new Date().toISOString().split("T")[0], []);
+  // Local Today string
+  const todayStr = useMemo(() => getLocalDateStr(), []);
 
-  // Quick add submit
-  const handleQuickAdd = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!quickTitle.trim()) return;
+  // Submit helper for Inline Quick Add
+  const handleQuickAddSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+
+    if (!quickTitle.trim()) {
+      setIsQuickAddExpanded(true);
+      quickInputRef.current?.focus();
+      return;
+    }
 
     const linkedCard = cards.find((c) => c.id === quickCardId);
 
@@ -66,13 +90,36 @@ export default function TasksPage() {
       contentCardId: quickCardId || undefined,
       contentCardTitle: linkedCard ? linkedCard.title : undefined,
       contentType: linkedCard ? linkedCard.type : undefined,
-      dueDate: quickDueDate || undefined,
+      dueDate: quickDueDate || todayStr,
       status: "todo",
     });
 
     setQuickTitle("");
     setQuickCardId("");
     setIsQuickAddExpanded(false);
+  };
+
+  // Submit helper for Dedicated Create Modal
+  const handleModalSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!modalTitle.trim()) return;
+
+    const linkedCard = cards.find((c) => c.id === modalCardId);
+
+    addTask({
+      title: modalTitle.trim(),
+      priority: modalPriority,
+      contentCardId: modalCardId || undefined,
+      contentCardTitle: linkedCard ? linkedCard.title : undefined,
+      contentType: linkedCard ? linkedCard.type : undefined,
+      dueDate: modalDueDate || todayStr,
+      assignee: modalAssignee || "Unassigned",
+      status: "todo",
+    });
+
+    setModalTitle("");
+    setModalCardId("");
+    setIsModalOpen(false);
   };
 
   // Filtered tasks
@@ -108,10 +155,10 @@ export default function TasksPage() {
     [tasks]
   );
 
-  // List View Grouping
+  // List View Grouping (Using local date math)
   const urgentGroup = useMemo(() => {
     return filteredTasks.filter(
-      (t) => t.status !== "done" && (t.priority === "High" || (t.dueDate && t.dueDate < todayStr))
+      (t) => t.status !== "done" && (t.priority === "High" || (Boolean(t.dueDate) && t.dueDate! < todayStr))
     );
   }, [filteredTasks, todayStr]);
 
@@ -120,8 +167,7 @@ export default function TasksPage() {
       (t) =>
         t.status !== "done" &&
         t.priority !== "High" &&
-        t.dueDate === todayStr &&
-        (!t.dueDate || t.dueDate >= todayStr)
+        t.dueDate === todayStr
     );
   }, [filteredTasks, todayStr]);
 
@@ -142,7 +188,6 @@ export default function TasksPage() {
   const contentClusters = useMemo(() => {
     const map = new Map<string, { card?: ContentCard; tasks: TaskItem[] }>();
 
-    // First collect all cards that have tasks
     (tasks || []).forEach((t) => {
       const key = t.contentCardId || "__studio_ops__";
       if (!map.has(key)) {
@@ -176,7 +221,7 @@ export default function TasksPage() {
       <main className="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 pt-2">
         {/* Sub-Header & Controls Bar */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
-          {/* Title & Live Status */}
+          {/* Title & Primary Action Button */}
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-bold tracking-[0.2em] uppercase font-mono text-[#8E4128] dark:text-[#C85D3A]">
@@ -187,12 +232,25 @@ export default function TasksPage() {
                 {openTasks.length} open • {urgentTasks.length} urgent • {completedTasks.length} completed
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#111110] dark:text-[#F5F3EF] flex items-center gap-3">
-              Tasks
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#111110] dark:text-[#F5F3EF]">
+                Tasks
+              </h1>
               <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-black/5 dark:bg-white/[0.06] text-zinc-600 dark:text-zinc-300 border border-black/5 dark:border-white/10 font-mono">
                 {tasks.length} total
               </span>
-            </h1>
+
+              {/* Primary + Add Task Button (Agency OS Terracotta Gradient) */}
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(true)}
+                className="relative py-1.5 px-3.5 bg-gradient-to-b from-[#8E4128]/95 to-[#6E2E1A]/95 hover:from-[#9E4A2F] hover:to-[#7E351F] border border-[#D97755]/50 text-white rounded-full font-semibold text-xs shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_3px_10px_rgba(127,57,34,0.3)] flex items-center gap-1.5 transition-all active:scale-[0.98] overflow-hidden cursor-pointer"
+              >
+                <span className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent rounded-t-full" />
+                <Plus className="w-3.5 h-3.5 stroke-[2.5] relative z-10" />
+                <span className="relative z-10 font-semibold">Add Task</span>
+              </button>
+            </div>
           </div>
 
           {/* Controls: View Modes & Quick Filters */}
@@ -271,10 +329,11 @@ export default function TasksPage() {
         {/* LINEAR-STYLE QUICK ADD INPUT                            */}
         {/* ======================================================== */}
         <div className="bg-white/80 dark:bg-[#131414]/90 backdrop-blur-xl rounded-2xl border border-black/[0.08] dark:border-white/[0.12] shadow-sm p-3 mb-6 transition-all focus-within:border-[#8E4128]/50">
-          <form onSubmit={handleQuickAdd} className="space-y-3">
+          <form onSubmit={handleQuickAddSubmit} className="space-y-3">
             <div className="flex items-center gap-3">
               <Plus className="w-4 h-4 text-[#8E4128] shrink-0" />
               <input
+                ref={quickInputRef}
                 type="text"
                 value={quickTitle}
                 onChange={(e) => {
@@ -282,14 +341,20 @@ export default function TasksPage() {
                   if (!isQuickAddExpanded) setIsQuickAddExpanded(true);
                 }}
                 onFocus={() => setIsQuickAddExpanded(true)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleQuickAddSubmit();
+                  }
+                }}
                 placeholder="Add a new task... (e.g. Generate Midjourney cover art, Record voiceover)"
                 className="flex-1 bg-transparent text-sm text-zinc-900 dark:text-[#F5F3EF] outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-600 font-medium"
               />
 
               <button
-                type="submit"
-                disabled={!quickTitle.trim()}
-                className="px-4 py-1.5 text-xs font-semibold text-white bg-gradient-to-b from-[#8E4128] to-[#6E2E1A] hover:from-[#9E4A2F] hover:to-[#7E351F] disabled:opacity-40 rounded-full transition-all cursor-pointer shadow-xs shrink-0"
+                type="button"
+                onClick={() => handleQuickAddSubmit()}
+                className="px-4 py-1.5 text-xs font-semibold text-white bg-gradient-to-b from-[#8E4128] to-[#6E2E1A] hover:from-[#9E4A2F] hover:to-[#7E351F] active:scale-95 rounded-full transition-all cursor-pointer shadow-xs shrink-0"
               >
                 Add Task
               </button>
@@ -640,6 +705,142 @@ export default function TasksPage() {
           </div>
         )}
       </main>
+
+      {/* ======================================================== */}
+      {/* MODAL: DEDICATED CREATE TASK MODAL                      */}
+      {/* ======================================================== */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in">
+          <div className="bg-white dark:bg-[#131414] rounded-3xl border border-black/10 dark:border-white/15 shadow-2xl max-w-md w-full p-6 space-y-4 animate-in zoom-in-95">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-bold text-[#8E4128] font-mono tracking-wider uppercase">
+                  OPERATIONAL ACTION
+                </span>
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-[#F5F3EF]">
+                  Add New Task
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleModalSubmit} className="space-y-4 pt-1">
+              <div>
+                <label className="block text-xs font-semibold text-zinc-600 dark:text-[#8A8680] mb-1.5">
+                  Task Title
+                </label>
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  value={modalTitle}
+                  onChange={(e) => setModalTitle(e.target.value)}
+                  placeholder="e.g. Design Midjourney cover art, Record voiceover clips"
+                  className="w-full bg-zinc-50 dark:bg-[#181818] border border-black/10 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-zinc-800 dark:text-[#F5F3EF] outline-none focus:border-[#8E4128]"
+                />
+              </div>
+
+              {/* Priority Selector */}
+              <div>
+                <label className="block text-xs font-semibold text-zinc-600 dark:text-[#8A8680] mb-1.5">
+                  Priority
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(["High", "Medium", "Low"] as const).map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setModalPriority(p)}
+                      className={`py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer text-center ${
+                        modalPriority === p
+                          ? getPriorityBadge(p)
+                          : "bg-zinc-50 dark:bg-white/[0.04] border-black/10 dark:border-white/10 text-zinc-600 dark:text-zinc-400"
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Link to Content Post */}
+              <div>
+                <label className="block text-xs font-semibold text-zinc-600 dark:text-[#8A8680] mb-1.5">
+                  Associated Content Post (Optional)
+                </label>
+                <select
+                  value={modalCardId}
+                  onChange={(e) => setModalCardId(e.target.value)}
+                  className="w-full bg-zinc-50 dark:bg-[#181818] border border-black/10 dark:border-white/10 rounded-xl px-3 py-2.5 text-xs text-zinc-800 dark:text-[#F5F3EF] outline-none"
+                >
+                  <option value="">(None - Independent Studio Ops Task)</option>
+                  {cards.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      [{c.type}] {c.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                {/* Due Date */}
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-600 dark:text-[#8A8680] mb-1.5">
+                    Due Date
+                  </label>
+                  <input
+                    type="date"
+                    value={modalDueDate}
+                    onChange={(e) => setModalDueDate(e.target.value)}
+                    className="w-full bg-zinc-50 dark:bg-[#181818] border border-black/10 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-zinc-800 dark:text-[#F5F3EF] outline-none"
+                  />
+                </div>
+
+                {/* Assignee */}
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-600 dark:text-[#8A8680] mb-1.5">
+                    Assignee
+                  </label>
+                  <select
+                    value={modalAssignee}
+                    onChange={(e) => setModalAssignee(e.target.value)}
+                    className="w-full bg-zinc-50 dark:bg-[#181818] border border-black/10 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-zinc-800 dark:text-[#F5F3EF] outline-none"
+                  >
+                    <option value="Muzammil">Muzammil</option>
+                    <option value="Writer">Writer</option>
+                    <option value="Designer">Designer</option>
+                    <option value="Video Editor">Video Editor</option>
+                    <option value="Unassigned">Unassigned</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-black/[0.06] dark:border-white/[0.08]">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5 rounded-xl transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={!modalTitle.trim()}
+                  className="px-5 py-2 text-xs font-semibold text-white bg-gradient-to-b from-[#8E4128] to-[#6E2E1A] hover:from-[#9E4A2F] hover:to-[#7E351F] active:scale-95 disabled:opacity-50 rounded-xl cursor-pointer shadow-xs transition-all"
+                >
+                  Create Task
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -709,6 +910,14 @@ function TaskRow({
               <span className="text-[10px] text-zinc-400 font-mono flex items-center gap-1">
                 <Clock className="w-3 h-3" />
                 {task.dueDate}
+              </span>
+            )}
+
+            {/* Assignee */}
+            {task.assignee && task.assignee !== "Unassigned" && (
+              <span className="text-[10px] text-zinc-400 font-mono flex items-center gap-1">
+                <User className="w-3 h-3" />
+                {task.assignee}
               </span>
             )}
           </div>
