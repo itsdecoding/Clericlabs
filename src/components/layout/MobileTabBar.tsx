@@ -4,11 +4,11 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutGrid,
+  LayoutDashboard,
   SlidersHorizontal,
   Plus,
   Calendar,
-  PieChart,
+  BarChart3,
 } from "lucide-react";
 import { useContent } from "@/context/ContentContext";
 
@@ -33,14 +33,14 @@ export function MobileTabBar() {
         >
           <div
             className={`transition-colors ${
-              isHomeActive ? "text-[#FF5A1F]" : "text-gray-400 group-hover:text-gray-600"
+              isHomeActive ? "text-[#8E4128]" : "text-gray-400 group-hover:text-gray-600"
             }`}
           >
-            <LayoutGrid className="w-5 h-5 stroke-[2.2]" />
+            <LayoutDashboard className="w-5 h-5 stroke-[2.2]" />
           </div>
           <span
             className={`text-[10px] font-medium tracking-tight mt-0.5 leading-none transition-colors ${
-              isHomeActive ? "text-[#FF5A1F] font-bold" : "text-gray-400"
+              isHomeActive ? "text-[#8E4128] font-bold" : "text-gray-400"
             }`}
           >
             Home
@@ -54,14 +54,14 @@ export function MobileTabBar() {
         >
           <div
             className={`transition-colors ${
-              isContentActive ? "text-[#FF5A1F]" : "text-gray-400 group-hover:text-gray-600"
+              isContentActive ? "text-[#8E4128]" : "text-gray-400 group-hover:text-gray-600"
             }`}
           >
             <SlidersHorizontal className="w-5 h-5 stroke-[2.2]" />
           </div>
           <span
             className={`text-[10px] font-medium tracking-tight mt-0.5 leading-none transition-colors ${
-              isContentActive ? "text-[#FF5A1F] font-bold" : "text-gray-400"
+              isContentActive ? "text-[#8E4128] font-bold" : "text-gray-400"
             }`}
           >
             Content
@@ -74,11 +74,11 @@ export function MobileTabBar() {
             type="button"
             onClick={() => setIsCreateModalOpen(true)}
             aria-label="Create content"
-            className="w-12 h-12 rounded-full bg-[#FF5A1F] hover:bg-[#E84C12] active:scale-90 text-white flex items-center justify-center shadow-[0_6px_20px_rgba(255,90,31,0.45)] border-[3px] border-white transition-all cursor-pointer"
+            className="w-12 h-12 rounded-full bg-gradient-to-b from-[#8E4128] to-[#6E2E1A] hover:from-[#9E4A2F] hover:to-[#7E351F] active:scale-90 text-white flex items-center justify-center shadow-[0_6px_20px_rgba(142,65,40,0.45)] border-[3px] border-white transition-all cursor-pointer"
           >
             <Plus className="w-6 h-6 stroke-[2.8]" />
           </button>
-          <span className="text-[9.5px] font-bold text-gray-500 mt-0.5 leading-none">
+          <span className="text-[9.5px] font-bold text-gray-500 mt-0.5 leading-none font-mono">
             New
           </span>
         </div>
@@ -104,7 +104,7 @@ export function MobileTabBar() {
           className="flex-1 flex flex-col items-center justify-center py-1 group active:scale-95 transition-transform cursor-pointer"
         >
           <div className="text-gray-400 group-hover:text-gray-600 transition-colors">
-            <PieChart className="w-5 h-5 stroke-[2.2]" />
+            <BarChart3 className="w-5 h-5 stroke-[2.2]" />
           </div>
           <span className="text-[10px] font-medium tracking-tight mt-0.5 leading-none text-gray-400">
             Insights

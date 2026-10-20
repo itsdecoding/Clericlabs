@@ -1,56 +1,78 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import {
-  Layers,
-  Clock,
+  Flame,
   CheckCircle2,
-  Compass,
-  Boxes,
-  ArrowRight,
   TrendingUp,
+  Clock,
+  Layers,
+  ArrowRight,
   Calendar,
+  Sparkles,
+  ExternalLink,
+  Film,
+  Compass,
 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useContent } from "@/context/ContentContext";
 
-
 export default function HomePage() {
-  const { cards, setIsCreateModalOpen } = useContent();
+  const { cards, setIsCreateModalOpen, updateCardStatus } = useContent();
 
-  const continueCreatingItems = cards.filter(
-    (c) => c.status === "Scripting" || c.status === "In Editing" || c.status === "For Review"
-  ).slice(0, 4);
+  const [currentTime, setCurrentTime] = useState("");
+  const [activeTab, setActiveTab] = useState<"priority" | "production" | "calendar" | "trends">("priority");
 
-  const needsReviewItems = cards.filter((c) => c.status === "For Review").slice(0, 4);
+  useEffect(() => {
+    function updateClock() {
+      const now = new Date();
+      const formatted = new Intl.DateTimeFormat("en-IN", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+        timeZoneName: "short",
+      }).format(now);
+      setCurrentTime(formatted);
+    }
+    updateClock();
+    const interval = setInterval(updateClock, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const needsReviewItems = useMemo(
+    () => cards.filter((c) => c.status === "For Review" || c.status === "Requires Revision"),
+    [cards]
+  );
+
+  const inProductionItems = useMemo(
+    () => cards.filter((c) => c.status === "Scripting" || c.status === "Filming (Approved)" || c.status === "In Editing"),
+    [cards]
+  );
 
   const totalContent = cards.length;
   const activePipeline = cards.filter((c) => c.status !== "Posted" && c.status !== "Dismissed").length;
   const postedCount = cards.filter((c) => c.status === "Posted").length;
   const radarIdeas = cards.filter((c) => c.status === "Idea").length;
-  const reviewCount = cards.filter((c) => c.status === "For Review").length;
+  const reviewCount = needsReviewItems.length;
 
   const contentTypes = [
-    { name: "IG Reel · Standard", icon: "🎬" },
-    { name: "IG B-roll · Trial", icon: "🎞️" },
-    { name: "IG Carousel", icon: "🎴" },
-    { name: "LinkedIn", icon: "💼" },
-    { name: "X / Twitter", icon: "𝕏" },
-    { name: "YouTube Long", icon: "▶️" },
+    { name: "IG Reel · Standard", count: cards.filter((c) => c.type.includes("IG Reel")).length },
+    { name: "IG B-roll · Trial", count: cards.filter((c) => c.type.includes("B-roll")).length },
+    { name: "IG Carousel", count: cards.filter((c) => c.type.includes("Carousel")).length },
+    { name: "LinkedIn", count: cards.filter((c) => c.type.includes("LinkedIn")).length },
+    { name: "X / Twitter", count: cards.filter((c) => c.type.includes("Twitter") || c.type.includes("X")).length },
+    { name: "YouTube Long", count: cards.filter((c) => c.type.includes("YouTube")).length },
   ];
-
-  const contentTypeStats = contentTypes.map((t) => ({
-    name: t.name,
-    icon: t.icon,
-    count: cards.filter((c) => c.type.includes(t.name.split(" · ")[0])).length,
-  }));
 
   const statusDefs = [
     { name: "Idea", colorDot: "#9CA3AF", pillBg: "#F3F4F6", pillText: "#4B5563" },
     { name: "Scripting", colorDot: "#60A5FA", pillBg: "#EFF6FF", pillText: "#1D4ED8" },
     { name: "Filming (Approved)", colorDot: "#F472B6", pillBg: "#FDF2F8", pillText: "#BE185D" },
-    { name: "In Editing", colorDot: "#FF5A1F", pillBg: "#FFF3EC", pillText: "#D9531E" },
+    { name: "In Editing", colorDot: "#E04F2E", pillBg: "#FFF3EC", pillText: "#C43B1B" },
     { name: "For Review", colorDot: "#F59E0B", pillBg: "#FEF9EE", pillText: "#B47D14" },
     { name: "Requires Revision", colorDot: "#EF4444", pillBg: "#FEECEC", pillText: "#DC2626" },
     { name: "Approved", colorDot: "#10B981", pillBg: "#EEF9F1", pillText: "#1E8E3E" },
@@ -62,328 +84,297 @@ export default function HomePage() {
     count: cards.filter((c) => c.status === s.name).length,
   }));
 
+  const tabs = [
+    {
+      id: "priority",
+      label: "Priority",
+      icon: Flame,
+      badge: reviewCount > 0 ? String(reviewCount) : undefined,
+    },
+    {
+      id: "production",
+      label: "In Production",
+      icon: Film,
+      badge: inProductionItems.length > 0 ? String(inProductionItems.length) : undefined,
+    },
+    {
+      id: "calendar",
+      label: "Editorial Schedule",
+      icon: Calendar,
+    },
+    {
+      id: "trends",
+      label: "Pipeline & Trends",
+      icon: TrendingUp,
+    },
+  ];
+
   return (
     <div className="min-h-screen pb-16">
       <Header />
 
-      <main className="px-4 sm:px-6 md:px-8 max-w-[1440px] mx-auto space-y-6">
-        {/* Hero Section */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-2 pb-2">
+      <main className="px-4 sm:px-6 md:px-8 max-w-[1440px] mx-auto space-y-6 pt-2">
+        {/* ========================================================================= */}
+        {/* 1. COMMAND CENTER HEADER (Agency OS Design System)                       */}
+        {/* ========================================================================= */}
+        <div className="pb-4 border-b border-[#ECE8E1] pt-1 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <span className="block text-[10.5px] md:text-[11px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-2">
-              OVERVIEW
+            <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-[#8A8680] block font-mono">
+              COMMAND CENTER
             </span>
-            <h1 className="text-2xl sm:text-3xl md:text-[34px] font-extrabold text-[#1A1A1A] tracking-tight leading-tight">
-              Make something worth sharing.
+            <h1 className="text-3xl sm:text-4xl font-black text-[#111110] tracking-tight mt-0.5">
+              Dashboard
             </h1>
-            <p className="text-[13px] sm:text-[13.5px] text-gray-500 font-normal mt-1">
-              Pick up a draft, clear a review, or start your next piece.
+            <p suppressHydrationWarning className="text-xs font-mono text-[#6E6B66] pt-0.5">
+              {currentTime || "Content Production Operations • Clericlabs"}
             </p>
           </div>
 
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="w-full sm:w-auto justify-center bg-[#FF5A1F] hover:bg-[#E84C12] active:scale-[0.98] transition-all text-white font-semibold text-[13.5px] py-2.5 px-5 rounded-xl shadow-[0_2px_8px_rgba(255,90,31,0.25)] flex items-center gap-2 cursor-pointer"
-          >
-            <span>Create content</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
+          {/* Sub-nav tabs: [Priority 🔥 1] [In Production 🎬] [Schedule] [Trends] */}
+          <div className="flex items-center gap-1 p-1 bg-black/5 rounded-2xl border border-[#ECE8E1] overflow-x-auto no-scrollbar w-full md:w-auto">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
 
-        {/* Top 2-Column Row: Continue Creating & Needs Your Attention */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left: Continue creating */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Layers className="w-4 h-4 text-gray-400" />
-                <h3 className="text-[14px] font-bold text-[#1A1A1A]">
-                  Continue creating
-                </h3>
-              </div>
-              <Link
-                href="/content"
-                className="text-[12px] font-medium text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                View all &rarr;
-              </Link>
-            </div>
-
-            {continueCreatingItems.length === 0 ? (
-              <div className="py-8 text-center">
-                <p className="text-[13px] text-gray-400">No active in-progress drafts.</p>
+              return (
                 <button
-                  onClick={() => setIsCreateModalOpen(true)}
-                  className="mt-2 text-[12.5px] font-semibold text-[#FF5A1F] hover:underline"
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs transition-all shrink-0 whitespace-nowrap rounded-xl cursor-pointer ${
+                    isActive
+                      ? "font-bold text-[#111110] bg-white shadow-sm"
+                      : "font-medium text-[#6E6B66] hover:text-[#111110]"
+                  }`}
                 >
-                  + Create content
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-2.5">
-                {continueCreatingItems.map((item) => (
-                  <Link
-                    key={item.id}
-                    href={`/content/${item.id}`}
-                    className="block p-3 rounded-xl border border-gray-100/90 hover:border-gray-200 hover:bg-gray-50/50 transition-all group"
-                  >
-                    <h4 className="text-[13.5px] font-bold text-[#1A1A1A] group-hover:text-[#FF5A1F] transition-colors leading-snug">
-                      {item.title}
-                    </h4>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="text-[11px] font-medium px-2 py-0.5 rounded-md flex items-center gap-1 bg-[#EEF2FF] text-[#4F46E5]">
-                        {item.type}
-                      </span>
-                      <span className="text-[11px] font-medium px-2 py-0.5 rounded-md flex items-center gap-1.5 bg-[#FFF3EC] text-[#D9531E]">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#FF5A1F]" />
-                        {item.status}
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Right: Needs your attention */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-gray-400" />
-                  <h3 className="text-[14px] font-bold text-[#1A1A1A]">
-                    Needs your attention
-                  </h3>
-                </div>
-                <Link
-                  href="/content"
-                  className="text-[12px] font-medium text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  View all &rarr;
-                </Link>
-              </div>
-
-              {/* Highlight Review Shortlist Banner */}
-              <Link
-                href="/content"
-                className="block bg-[#FFF5ED] border border-[#FFE7D3] rounded-xl p-3.5 mb-5 hover:bg-[#FFEFE2] transition-colors"
-              >
-                <div className="text-[13px] font-medium text-gray-900">
-                  {reviewCount} items in the review shortlist &rarr;
-                </div>
-              </Link>
-
-              {/* Deadlines text row */}
-              <div className="space-y-1 mb-2">
-                <Link
-                  href="/content"
-                  className="text-[13px] font-medium text-gray-800 hover:text-gray-900 block"
-                >
-                  0 past editorial deadlines · 0 failed publishing attempts &rarr;
-                </Link>
-                <p className="text-[11.5px] text-gray-400">
-                  Editorial deadlines are separate from confirmed publishing times.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Metrics Row (5 Cards) */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-            <div className="w-6 h-6 rounded-lg text-[#FF5A1F] flex items-center justify-center mb-2">
-              <Layers className="w-4 h-4" />
-            </div>
-            <div className="text-[24px] sm:text-[26px] font-bold text-[#1A1A1A] leading-tight">
-              {totalContent}
-            </div>
-            <div className="text-[11px] font-medium text-gray-400 mt-0.5">
-              Total Content
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-            <div className="w-6 h-6 rounded-lg text-[#FF5A1F] flex items-center justify-center mb-2">
-              <Clock className="w-4 h-4" />
-            </div>
-            <div className="text-[24px] sm:text-[26px] font-bold text-[#1A1A1A] leading-tight">
-              {activePipeline}
-            </div>
-            <div className="text-[11px] font-medium text-gray-400 mt-0.5">
-              Active Pipeline
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-            <div className="w-6 h-6 rounded-lg text-[#FF5A1F] flex items-center justify-center mb-2">
-              <CheckCircle2 className="w-4 h-4" />
-            </div>
-            <div className="text-[24px] sm:text-[26px] font-bold text-[#1A1A1A] leading-tight">
-              {postedCount}
-            </div>
-            <div className="text-[11px] font-medium text-gray-400 mt-0.5">
-              Posted / Month
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-            <div className="w-6 h-6 rounded-lg text-[#FF5A1F] flex items-center justify-center mb-2">
-              <Compass className="w-4 h-4" />
-            </div>
-            <div className="text-[24px] sm:text-[26px] font-bold text-[#1A1A1A] leading-tight">
-              {radarIdeas}
-            </div>
-            <div className="text-[11px] font-medium text-gray-400 mt-0.5">
-              Radar Ideas
-            </div>
-          </div>
-
-          <div className="col-span-2 sm:col-span-1 bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-            <div className="w-6 h-6 rounded-lg text-[#FF5A1F] flex items-center justify-center mb-2">
-              <Boxes className="w-4 h-4" />
-            </div>
-            <div className="text-[24px] sm:text-[26px] font-bold text-[#1A1A1A] leading-tight">
-              {totalContent}
-            </div>
-            <div className="text-[11px] font-medium text-gray-400 mt-0.5">
-              Assets
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Section 1: By Content Type & By Status */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* By Content Type (2 cols span) */}
-          <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-4">
-            <h3 className="text-[14px] font-bold text-[#1A1A1A]">
-              By Content Type
-            </h3>
-
-            <div className="space-y-4 pt-1">
-              {contentTypeStats.map((item) => (
-                <div key={item.name} className="space-y-1.5">
-                  <div className="flex items-center justify-between text-[13px]">
-                    <span className="font-semibold text-gray-700 flex items-center gap-2">
-                      <span className="text-[13px]">{item.icon}</span>
-                      {item.name}
+                  <Icon
+                    className={`w-3.5 h-3.5 ${
+                      isActive ? "text-[#8E4128] stroke-[2.2]" : "text-[#8A8680]"
+                    }`}
+                  />
+                  <span>{tab.label}</span>
+                  {tab.badge && (
+                    <span className="text-[10px] font-mono px-1.5 py-0.2 bg-[#FFF3EC] text-[#8E4128] font-bold rounded-full">
+                      {tab.badge}
                     </span>
-                    <span className="font-bold text-gray-900">{item.count}</span>
-                  </div>
-                  <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-[#FF5A1F] rounded-full transition-all duration-500"
-                      style={{
-                        width: `${totalContent > 0 ? (item.count / totalContent) * 100 : 0}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* 2. PIPELINE & EDITORIAL SNAPSHOT (Agency OS Metric Cards)                */}
+        {/* ========================================================================= */}
+        <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-black/[0.08] p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-[10.5px] font-mono font-bold tracking-wider text-[#8E4128] uppercase">
+              PIPELINE & EDITORIAL SNAPSHOT
+            </span>
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-[#E8F5E9] text-[#2E7D32] border border-[#C8E6C9]">
+              {activePipeline} in play
+            </span>
           </div>
 
-          {/* By Status (1 col span) */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-3">
-            <h3 className="text-[14px] font-bold text-[#1A1A1A]">
-              By Status
-            </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+            {/* Card 1: In Production */}
+            <div className="p-4 rounded-xl bg-[#FAF8F5] border border-black/[0.06] flex flex-col justify-between">
+              <div className="flex items-center justify-between text-[#8A8680] mb-2">
+                <span className="text-[11px] font-mono font-bold uppercase tracking-wider">
+                  IN PRODUCTION
+                </span>
+                <Film className="w-3.5 h-3.5 text-[#8E4128]" />
+              </div>
+              <div className="text-3xl font-black text-[#111110] font-mono leading-none">
+                {activePipeline}
+              </div>
+              <p className="text-[11px] text-[#6E6B66] mt-2 truncate font-medium">
+                Active scripts & edits in flight
+              </p>
+            </div>
 
-            <div className="space-y-2 pt-1">
-              {statusStats.map((status) => (
-                <div
-                  key={status.name}
-                  className="flex items-center justify-between"
-                >
-                  <span
-                    className="text-[11.5px] font-medium px-2.5 py-0.5 rounded-md flex items-center gap-1.5"
-                    style={{ backgroundColor: status.pillBg, color: status.pillText }}
-                  >
-                    <span
-                      className="w-1.5 h-1.5 rounded-full"
-                      style={{ backgroundColor: status.colorDot }}
-                    />
-                    {status.name}
-                  </span>
-                  <span className="text-[13px] font-bold text-gray-800">
-                    {status.count}
-                  </span>
-                </div>
-              ))}
+            {/* Card 2: Needs Review */}
+            <div className="p-4 rounded-xl bg-[#FAF8F5] border border-black/[0.06] flex flex-col justify-between">
+              <div className="flex items-center justify-between text-[#8A8680] mb-2">
+                <span className="text-[11px] font-mono font-bold uppercase tracking-wider">
+                  NEEDS REVIEW
+                </span>
+                <Flame className="w-3.5 h-3.5 text-[#E04F2E]" />
+              </div>
+              <div className="text-3xl font-black text-[#111110] font-mono leading-none">
+                {reviewCount}
+              </div>
+              <p className="text-[11px] text-[#6E6B66] mt-2 truncate font-medium">
+                Pending editorial approval
+              </p>
+            </div>
+
+            {/* Card 3: Published */}
+            <div className="p-4 rounded-xl bg-[#FAF8F5] border border-black/[0.06] flex flex-col justify-between">
+              <div className="flex items-center justify-between text-[#8A8680] mb-2">
+                <span className="text-[11px] font-mono font-bold uppercase tracking-wider">
+                  PUBLISHED
+                </span>
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#2E7D32]" />
+              </div>
+              <div className="text-3xl font-black text-[#111110] font-mono leading-none">
+                {postedCount}
+              </div>
+              <p className="text-[11px] text-[#6E6B66] mt-2 truncate font-medium">
+                Total pieces live across channels
+              </p>
+            </div>
+
+            {/* Card 4: Radar Ideas */}
+            <div className="p-4 rounded-xl bg-[#FAF8F5] border border-black/[0.06] flex flex-col justify-between">
+              <div className="flex items-center justify-between text-[#8A8680] mb-2">
+                <span className="text-[11px] font-mono font-bold uppercase tracking-wider">
+                  RADAR IDEAS
+                </span>
+                <Compass className="w-3.5 h-3.5 text-[#8A8680]" />
+              </div>
+              <div className="text-3xl font-black text-[#111110] font-mono leading-none">
+                {radarIdeas}
+              </div>
+              <p className="text-[11px] text-[#6E6B66] mt-2 truncate font-medium">
+                Backlog ready for scripting
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Bottom Section 2: Needs Review & Upcoming editorial deadlines */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Needs Review */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-gray-400" />
-                <h3 className="text-[14px] font-bold text-[#1A1A1A]">
-                  Needs Review
-                </h3>
-              </div>
-              <Link
-                href="/content"
-                className="text-[12px] font-medium text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                View all &rarr;
-              </Link>
+        {/* ========================================================================= */}
+        {/* 3. PRIORITY / ACTION QUEUE (Agency OS Lead Card Style)                   */}
+        {/* ========================================================================= */}
+        <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-black/[0.08] p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Flame className="w-4 h-4 text-[#8E4128]" />
+              <h3 className="text-sm font-bold text-[#111110]">
+                Priority Editorial Queue{" "}
+                <span className="text-[#8E4128] font-mono">({reviewCount})</span>
+              </h3>
             </div>
+            <Link
+              href="/content"
+              className="text-xs font-semibold text-[#8E4128] hover:text-[#6E2E1A] transition-colors flex items-center gap-1"
+            >
+              <span>Open Content Board</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
 
-            {needsReviewItems.length === 0 ? (
-              <div className="py-8 text-center text-[13px] text-gray-400">
-                No items pending review.
-              </div>
-            ) : (
-              <div className="space-y-2.5">
-                {needsReviewItems.map((item) => (
-                  <Link
-                    key={item.id}
-                    href={`/content/${item.id}`}
-                    className="block p-3 rounded-xl border border-gray-100/90 hover:border-gray-200 hover:bg-gray-50/50 transition-all group"
-                  >
-                    <h4 className="text-[13.5px] font-bold text-[#1A1A1A] group-hover:text-[#FF5A1F] transition-colors leading-snug">
-                      {item.title}
-                    </h4>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="text-[11px] font-medium px-2 py-0.5 rounded-md flex items-center gap-1 bg-[#EEF2FF] text-[#4F46E5]">
+          {needsReviewItems.length === 0 ? (
+            <div className="py-10 text-center rounded-xl bg-[#FAF8F5] border border-dashed border-black/10">
+              <CheckCircle2 className="w-6 h-6 text-[#2E7D32] mx-auto mb-2" />
+              <p className="text-xs font-semibold text-[#111110]">All editorial reviews clear</p>
+              <p className="text-[11px] text-[#8A8680] mt-0.5">
+                No drafts are currently blocked waiting for sign-off.
+              </p>
+              <button
+                type="button"
+                onClick={() => setIsCreateModalOpen(true)}
+                className="mt-3 text-xs font-semibold text-[#8E4128] hover:underline cursor-pointer"
+              >
+                + Create new piece
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-2.5">
+              {needsReviewItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="p-4 rounded-xl bg-white border border-black/[0.08] hover:border-[#8E4128]/40 transition-all shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#FAF8F5] text-[#6E6B66] border border-black/5">
                         {item.type}
                       </span>
-                      <span className="text-[11px] font-medium px-2 py-0.5 rounded-md flex items-center gap-1.5 bg-[#FFF3EC] text-[#D9531E]">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#FF5A1F]" />
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#FEF9EE] text-[#B47D14] flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
                         {item.status}
                       </span>
                     </div>
-                  </Link>
-                ))}
-              </div>
-            )}
+                    <Link
+                      href={`/content/${item.id}`}
+                      className="text-sm font-bold text-[#111110] group-hover:text-[#8E4128] transition-colors line-clamp-1"
+                    >
+                      {item.title}
+                    </Link>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => updateCardStatus(item.id, "Approved")}
+                      className="px-3 py-1.5 rounded-full bg-[#8E4128] hover:bg-[#6E2E1A] text-white text-xs font-semibold transition-all active:scale-95 cursor-pointer shadow-xs"
+                    >
+                      Approve
+                    </button>
+                    <Link
+                      href={`/content/${item.id}`}
+                      className="px-3 py-1.5 rounded-full bg-[#FAF8F5] hover:bg-[#F3EFEA] text-[#111110] text-xs font-semibold border border-black/10 transition-colors"
+                    >
+                      Inspect
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ========================================================================= */}
+        {/* 4. BREAKDOWNS: By Channel & By Status                                     */}
+        {/* ========================================================================= */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* By Channel */}
+          <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-black/[0.08] p-5 shadow-xs space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#8A8680]">
+                Volume By Channel
+              </h3>
+              <span className="text-xs font-mono text-[#8A8680]">Live count</span>
+            </div>
+            <div className="divide-y divide-[#ECE8E1]">
+              {contentTypes.map((channel) => (
+                <div
+                  key={channel.name}
+                  className="py-2.5 flex items-center justify-between text-xs hover:bg-[#FAF8F5] px-2 rounded-lg transition-colors"
+                >
+                  <span className="font-medium text-[#111110]">{channel.name}</span>
+                  <span className="font-mono font-bold text-[#111110]">{channel.count}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Upcoming editorial deadlines */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm flex flex-col">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-gray-400" />
-                <h3 className="text-[14px] font-bold text-[#1A1A1A]">
-                  Upcoming editorial deadlines
-                </h3>
-              </div>
-              <Link
-                href="/content"
-                className="text-[12px] font-medium text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                View all &rarr;
-              </Link>
+          {/* By Status */}
+          <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-black/[0.08] p-5 shadow-xs space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#8A8680]">
+                Production Stage Distribution
+              </h3>
+              <span className="text-xs font-mono text-[#8A8680]">Workflow</span>
             </div>
-
-            <div className="flex-1 flex items-center justify-center py-12 text-center">
-              <p className="text-[13px] text-gray-400 font-normal">
-                No scheduled content yet.
-              </p>
+            <div className="divide-y divide-[#ECE8E1]">
+              {statusStats.map((st) => (
+                <div
+                  key={st.name}
+                  className="py-2.5 flex items-center justify-between text-xs hover:bg-[#FAF8F5] px-2 rounded-lg transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: st.colorDot }}
+                    />
+                    <span className="font-medium text-[#111110]">{st.name}</span>
+                  </div>
+                  <span className="font-mono font-bold text-[#111110]">{st.count}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

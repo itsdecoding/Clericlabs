@@ -9,8 +9,8 @@ import { CreateContentModal } from "@/components/modals/CreateContentModal";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Content OS — Clericlabs",
-  description: "Next-generation content pipeline and operating system for Clericlabs.",
+  title: "Content OS • Clericlabs",
+  description: "Internal command center and editorial production pipeline for Clericlabs.",
 };
 
 export default function RootLayout({

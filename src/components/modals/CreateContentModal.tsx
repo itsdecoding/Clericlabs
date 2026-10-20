@@ -41,19 +41,20 @@ export function CreateContentModal() {
         <div className="sm:hidden w-12 h-1.5 bg-gray-300/80 rounded-full mx-auto mb-4" />
 
         <button
+          type="button"
           onClick={() => setIsCreateModalOpen(false)}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-1.5 rounded-full hover:bg-gray-100 transition-colors"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-1.5 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
         >
           <X className="w-5 h-5 sm:w-4 sm:h-4" />
         </button>
 
         <div className="flex items-center gap-2.5 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-[#FFF0E8] text-[#FF5A1F] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-[#FFF3EC] text-[#8E4128] flex items-center justify-center">
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
             <h3 className="text-base font-bold text-[#1A1A1A]">Create Content</h3>
-            <p className="text-xs text-gray-400">Add a new item to your pipeline</p>
+            <p className="text-xs text-gray-400">Add a new item to your editorial pipeline</p>
           </div>
         </div>
 
@@ -68,7 +69,7 @@ export function CreateContentModal() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. 7 Cognitive Scripts You Inherited..."
-              className="w-full bg-gray-50/70 border border-gray-200 rounded-xl px-3.5 py-2.5 text-base sm:text-sm text-gray-900 outline-none focus:border-[#FF5A1F] focus:bg-white transition-colors"
+              className="w-full bg-gray-50/70 border border-gray-200 rounded-xl px-3.5 py-2.5 text-base sm:text-sm text-gray-900 outline-none focus:border-[#8E4128] focus:bg-white transition-colors"
             />
           </div>
 
@@ -145,13 +146,13 @@ export function CreateContentModal() {
             <button
               type="button"
               onClick={() => setIsCreateModalOpen(false)}
-              className="px-4 py-2.5 text-sm sm:text-xs font-medium text-gray-600 hover:bg-gray-100 active:scale-95 rounded-xl transition-all"
+              className="px-4 py-2.5 text-sm sm:text-xs font-medium text-gray-600 hover:bg-gray-100 active:scale-95 rounded-xl transition-all cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 sm:flex-initial px-6 py-2.5 text-sm sm:text-xs font-semibold text-white bg-[#FF5A1F] hover:bg-[#E84C12] active:scale-95 rounded-xl shadow-sm transition-all text-center justify-center flex items-center"
+              className="flex-1 sm:flex-initial px-5 py-2.5 text-xs font-semibold text-white bg-gradient-to-b from-[#8E4128]/95 to-[#6E2E1A]/95 hover:from-[#9E4A2F] hover:to-[#7E351F] border border-[#D97755]/50 active:scale-95 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_4px_14px_rgba(127,57,34,0.35)] transition-all text-center justify-center flex items-center cursor-pointer"
             >
               Create Draft
             </button>
