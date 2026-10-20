@@ -22,8 +22,10 @@ export function Sidebar() {
 
   const isHomeActive = pathname === "/home" || pathname === "/";
   const isContentActive = pathname.startsWith("/content");
+  const isCalendarActive = pathname.startsWith("/calendar");
 
   const pendingReviewCount = cards.filter((c) => c.status === "For Review").length;
+  const scheduledCount = cards.filter((c) => Boolean(c.scheduledDate)).length;
 
   const navItems = [
     {
@@ -47,9 +49,10 @@ export function Sidebar() {
     },
     {
       label: "Calendar",
-      href: "/content",
+      href: "/calendar",
       icon: Calendar,
-      isActive: false,
+      isActive: isCalendarActive,
+      badge: scheduledCount > 0 ? String(scheduledCount) : undefined,
     },
     {
       label: "Insights",

@@ -20,6 +20,7 @@ export interface ContentCard {
   designer?: string;
   writer?: string;
   dueDate?: string;
+  scheduledDate?: string;
   postedAt?: string;
   tags?: string;
   activityLog?: { text: string; time: string }[];

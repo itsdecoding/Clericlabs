@@ -18,6 +18,7 @@ export function MobileTabBar() {
 
   const isHomeActive = pathname === "/home" || pathname === "/";
   const isContentActive = pathname.startsWith("/content");
+  const isCalendarActive = pathname.startsWith("/calendar");
 
   return (
     <nav
@@ -84,18 +85,29 @@ export function MobileTabBar() {
         </div>
 
         {/* 4. Calendar Tab */}
-        <button
-          type="button"
-          onClick={() => {}}
-          className="flex-1 flex flex-col items-center justify-center py-1 group active:scale-95 transition-transform cursor-pointer"
+        <Link
+          href="/calendar"
+          className="flex-1 flex flex-col items-center justify-center py-1 group active:scale-95 transition-transform"
         >
-          <div className="text-gray-400 dark:text-[#8A8680] group-hover:text-gray-600 dark:group-hover:text-[#F5F3EF] transition-colors">
+          <div
+            className={`transition-colors ${
+              isCalendarActive
+                ? "text-[#8E4128]"
+                : "text-gray-400 dark:text-[#8A8680] group-hover:text-gray-600 dark:group-hover:text-[#F5F3EF]"
+            }`}
+          >
             <Calendar className="w-5 h-5 stroke-[2.2]" />
           </div>
-          <span className="text-[10px] font-medium tracking-tight mt-0.5 leading-none text-gray-400 dark:text-[#8A8680]">
+          <span
+            className={`text-[10px] font-medium tracking-tight mt-0.5 leading-none transition-colors ${
+              isCalendarActive
+                ? "text-[#8E4128] font-bold"
+                : "text-gray-400 dark:text-[#8A8680]"
+            }`}
+          >
             Calendar
           </span>
-        </button>
+        </Link>
 
         {/* 5. Insights Tab */}
         <button

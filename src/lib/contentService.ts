@@ -16,6 +16,7 @@ export function mapRowToCard(row: Record<string, any>): ContentCard {
     caption: row.caption || undefined,
     hashtags: row.hashtags || undefined,
     dueDate: row.due_date || undefined,
+    scheduledDate: row.scheduled_date || undefined,
     postedAt: row.posted_at || undefined,
     tags: row.tags || undefined,
     briefUrl: row.brief_url || undefined,
@@ -50,6 +51,7 @@ export function mapCardToRow(card: Partial<ContentCard>): Record<string, any> {
   if (card.caption !== undefined) row.caption = card.caption;
   if (card.hashtags !== undefined) row.hashtags = card.hashtags;
   if (card.dueDate !== undefined) row.due_date = card.dueDate;
+  if (card.scheduledDate !== undefined) row.scheduled_date = card.scheduledDate;
   if (card.postedAt !== undefined) row.posted_at = card.postedAt;
   if (card.tags !== undefined) row.tags = card.tags;
   if (card.briefUrl !== undefined) row.brief_url = card.briefUrl;

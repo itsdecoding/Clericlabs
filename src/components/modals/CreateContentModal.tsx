@@ -14,6 +14,7 @@ export function CreateContentModal() {
   const [status, setStatus] = useState("Idea");
   const [category, setCategory] = useState("AI News");
   const [priority, setPriority] = useState("Medium");
+  const [scheduledDate, setScheduledDate] = useState("");
 
   if (!isCreateModalOpen) return null;
 
@@ -27,6 +28,7 @@ export function CreateContentModal() {
       status,
       category,
       priority,
+      scheduledDate: scheduledDate || undefined,
     });
 
     setTitle("");
@@ -140,6 +142,18 @@ export function CreateContentModal() {
                 <option value="High">High</option>
               </select>
             </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 dark:text-[#8A8680] mb-1">
+              Publish / Scheduled Date <span className="text-[10px] text-gray-400 font-normal">(Optional)</span>
+            </label>
+            <input
+              type="date"
+              value={scheduledDate}
+              onChange={(e) => setScheduledDate(e.target.value)}
+              className="w-full bg-gray-50/70 dark:bg-white/[0.04] border border-gray-200 dark:border-white/10 rounded-xl px-3.5 py-2 text-sm text-gray-800 dark:text-[#F5F3EF] outline-none focus:border-[#8E4128]"
+            />
           </div>
 
           <div className="flex justify-end gap-2 pt-2">

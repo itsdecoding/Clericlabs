@@ -14,6 +14,7 @@ interface ContentContextType {
   cards: ContentCard[];
   updateCardStatus: (cardId: string, newStatus: string) => void;
   updateCard: (updatedCard: ContentCard) => void;
+  scheduleCard: (cardId: string, date: string | null) => void;
   addCard: (card: Partial<ContentCard>) => ContentCard;
   deleteCard: (id: string) => void;
   clearAllCards: () => void;
@@ -124,6 +125,31 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const scheduleCard = useCallback((cardId: string, date: string | null) => {
+    setCards((prev) => {
+      const target = prev.find((c) => c.id === cardId);
+      if (!target) return prev;
+
+      const updated: ContentCard = {
+        ...target,
+        scheduledDate: date || undefined,
+        activityLog: [
+          {
+            text: date ? `Scheduled for ${date}` : "Removed from schedule",
+            time: "Just now",
+          },
+          ...(target.activityLog || []),
+        ],
+      };
+
+      const newCards = prev.map((c) => (c.id === cardId ? updated : c));
+      upsertCardInDb(updated).catch((err) =>
+        console.warn("Error scheduling card in DB:", err)
+      );
+      return newCards;
+    });
+  }, []);
+
   const addCard = useCallback((cardData: Partial<ContentCard>) => {
     const newCard: ContentCard = {
       id: "card-" + Date.now(),
@@ -187,6 +213,7 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
         cards,
         updateCardStatus,
         updateCard,
+        scheduleCard,
         addCard,
         deleteCard,
         clearAllCards,
