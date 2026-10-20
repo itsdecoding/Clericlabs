@@ -9,9 +9,6 @@ import {
   Clock,
   Layers,
   ArrowRight,
-  Calendar,
-  Sparkles,
-  ExternalLink,
   Film,
   Compass,
 } from "lucide-react";
@@ -22,7 +19,6 @@ export default function HomePage() {
   const { cards, setIsCreateModalOpen, updateCardStatus } = useContent();
 
   const [currentTime, setCurrentTime] = useState("");
-  const [activeTab, setActiveTab] = useState<"priority" | "production" | "calendar" | "trends">("priority");
 
   useEffect(() => {
     function updateClock() {
@@ -48,11 +44,6 @@ export default function HomePage() {
     [cards]
   );
 
-  const inProductionItems = useMemo(
-    () => cards.filter((c) => c.status === "Scripting" || c.status === "Filming (Approved)" || c.status === "In Editing"),
-    [cards]
-  );
-
   const totalContent = cards.length;
   const activePipeline = cards.filter((c) => c.status !== "Posted" && c.status !== "Dismissed").length;
   const postedCount = cards.filter((c) => c.status === "Posted").length;
@@ -69,14 +60,14 @@ export default function HomePage() {
   ];
 
   const statusDefs = [
-    { name: "Idea", colorDot: "#9CA3AF", pillBg: "#F3F4F6", pillText: "#4B5563" },
-    { name: "Scripting", colorDot: "#60A5FA", pillBg: "#EFF6FF", pillText: "#1D4ED8" },
-    { name: "Filming (Approved)", colorDot: "#F472B6", pillBg: "#FDF2F8", pillText: "#BE185D" },
-    { name: "In Editing", colorDot: "#E04F2E", pillBg: "#FFF3EC", pillText: "#C43B1B" },
-    { name: "For Review", colorDot: "#F59E0B", pillBg: "#FEF9EE", pillText: "#B47D14" },
-    { name: "Requires Revision", colorDot: "#EF4444", pillBg: "#FEECEC", pillText: "#DC2626" },
-    { name: "Approved", colorDot: "#10B981", pillBg: "#EEF9F1", pillText: "#1E8E3E" },
-    { name: "Posted", colorDot: "#059669", pillBg: "#ECFDF5", pillText: "#047857" },
+    { name: "Idea", colorDot: "#9CA3AF" },
+    { name: "Scripting", colorDot: "#60A5FA" },
+    { name: "Filming (Approved)", colorDot: "#F472B6" },
+    { name: "In Editing", colorDot: "#8E4128" },
+    { name: "For Review", colorDot: "#F59E0B" },
+    { name: "Requires Revision", colorDot: "#EF4444" },
+    { name: "Approved", colorDot: "#10B981" },
+    { name: "Posted", colorDot: "#059669" },
   ];
 
   const statusStats = statusDefs.map((s) => ({
@@ -84,38 +75,13 @@ export default function HomePage() {
     count: cards.filter((c) => c.status === s.name).length,
   }));
 
-  const tabs = [
-    {
-      id: "priority",
-      label: "Priority",
-      icon: Flame,
-      badge: reviewCount > 0 ? String(reviewCount) : undefined,
-    },
-    {
-      id: "production",
-      label: "In Production",
-      icon: Film,
-      badge: inProductionItems.length > 0 ? String(inProductionItems.length) : undefined,
-    },
-    {
-      id: "calendar",
-      label: "Editorial Schedule",
-      icon: Calendar,
-    },
-    {
-      id: "trends",
-      label: "Pipeline & Trends",
-      icon: TrendingUp,
-    },
-  ];
-
   return (
     <div className="min-h-screen pb-16">
       <Header />
 
       <main className="px-4 sm:px-6 md:px-8 max-w-[1440px] mx-auto space-y-6 pt-2">
         {/* ========================================================================= */}
-        {/* 1. COMMAND CENTER HEADER (Agency OS Design System)                       */}
+        {/* 1. COMMAND CENTER HEADER (Agency OS Clean Title Block)                    */}
         {/* ========================================================================= */}
         <div className="pb-4 border-b border-[#ECE8E1] pt-1 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -128,39 +94,6 @@ export default function HomePage() {
             <p suppressHydrationWarning className="text-xs font-mono text-[#6E6B66] pt-0.5">
               {currentTime || "Content Production Operations • Clericlabs"}
             </p>
-          </div>
-
-          {/* Sub-nav tabs: [Priority 🔥 1] [In Production 🎬] [Schedule] [Trends] */}
-          <div className="flex items-center gap-1 p-1 bg-black/5 rounded-2xl border border-[#ECE8E1] overflow-x-auto no-scrollbar w-full md:w-auto">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs transition-all shrink-0 whitespace-nowrap rounded-xl cursor-pointer ${
-                    isActive
-                      ? "font-bold text-[#111110] bg-white shadow-sm"
-                      : "font-medium text-[#6E6B66] hover:text-[#111110]"
-                  }`}
-                >
-                  <Icon
-                    className={`w-3.5 h-3.5 ${
-                      isActive ? "text-[#8E4128] stroke-[2.2]" : "text-[#8A8680]"
-                    }`}
-                  />
-                  <span>{tab.label}</span>
-                  {tab.badge && (
-                    <span className="text-[10px] font-mono px-1.5 py-0.2 bg-[#FFF3EC] text-[#8E4128] font-bold rounded-full">
-                      {tab.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
           </div>
         </div>
 
