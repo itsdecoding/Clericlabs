@@ -26,6 +26,22 @@ export interface ContentCard {
   activityLog?: { text: string; time: string }[];
 }
 
+export interface TaskItem {
+  id: string;
+  title: string;
+  status: "todo" | "in_progress" | "done";
+  priority: "High" | "Medium" | "Low";
+  contentCardId?: string;
+  contentCardTitle?: string;
+  contentType?: string;
+  assignee?: string;
+  dueDate?: string;
+  createdAt: string;
+  completedAt?: string;
+}
+
+export const INITIAL_TASKS: TaskItem[] = [];
+
 export const INITIAL_CARDS: ContentCard[] = [];
 
 export const CONTENT_TYPE_STATS = [

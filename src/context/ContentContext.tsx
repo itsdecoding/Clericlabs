@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { ContentCard, INITIAL_CARDS } from "@/data/mockData";
+import { ContentCard, TaskItem, INITIAL_CARDS, INITIAL_TASKS } from "@/data/mockData";
 import {
   fetchCardsFromDb,
   upsertCardInDb,
@@ -29,14 +29,59 @@ interface ContentContextType {
   setIsCreateModalOpen: (open: boolean) => void;
   isDbConnected: boolean;
   isSyncing: boolean;
+  tasks: TaskItem[];
+  addTask: (task: Partial<TaskItem>) => TaskItem;
+  toggleTaskStatus: (taskId: string) => void;
+  updateTask: (updatedTask: TaskItem) => void;
+  deleteTask: (taskId: string) => void;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_KEY = "clericlabs_content_cards_v1";
+const TASKS_STORAGE_KEY = "clericlabs_tasks_v1";
+
+const DEFAULT_STARTER_TASKS: TaskItem[] = [
+  {
+    id: "task-1",
+    title: "Generate Midjourney cover art & typography layout",
+    status: "todo",
+    priority: "High",
+    contentType: "IG Carousel",
+    dueDate: "2026-10-21",
+    createdAt: "2026-10-20",
+  },
+  {
+    id: "task-2",
+    title: "Record voiceover audio & sound bite clips",
+    status: "in_progress",
+    priority: "High",
+    contentType: "IG Reel · Standard",
+    dueDate: "2026-10-21",
+    createdAt: "2026-10-20",
+  },
+  {
+    id: "task-3",
+    title: "Batch research 10 viral hooks for Q4 newsletter",
+    status: "todo",
+    priority: "Medium",
+    dueDate: "2026-10-23",
+    createdAt: "2026-10-20",
+  },
+  {
+    id: "task-4",
+    title: "Audit top-performing Reels & Carousels of September",
+    status: "done",
+    priority: "Low",
+    dueDate: "2026-10-19",
+    createdAt: "2026-10-18",
+    completedAt: "2026-10-19",
+  },
+];
 
 export function ContentProvider({ children }: { children: React.ReactNode }) {
   const [cards, setCards] = useState<ContentCard[]>([]);
+  const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [activeFilter, setActiveFilter] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedWriter, setSelectedWriter] = useState<string>("All Writers");
@@ -55,6 +100,18 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {
       console.warn("Could not load from localStorage", e);
     }
+
+    try {
+      const storedTasks = localStorage.getItem(TASKS_STORAGE_KEY);
+      if (storedTasks !== null) {
+        setTasks(JSON.parse(storedTasks));
+      } else {
+        setTasks(DEFAULT_STARTER_TASKS);
+      }
+    } catch (e) {
+      setTasks(DEFAULT_STARTER_TASKS);
+    }
+
     setIsLoaded(true);
 
     // Fetch from Supabase
@@ -89,8 +146,13 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
       } catch (e) {
         console.warn("Could not save to localStorage", e);
       }
+      try {
+        localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
+      } catch (e) {
+        console.warn("Could not save tasks to localStorage", e);
+      }
     }
-  }, [cards, isLoaded]);
+  }, [cards, tasks, isLoaded]);
 
   const updateCardStatus = useCallback((cardId: string, newStatus: string) => {
     setCards((prev) => {
@@ -207,6 +269,49 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
     [cards]
   );
 
+  const addTask = useCallback((taskData: Partial<TaskItem>) => {
+    const newTask: TaskItem = {
+      id: "task-" + Date.now(),
+      title: taskData.title || "Untitled Task",
+      status: taskData.status || "todo",
+      priority: taskData.priority || "Medium",
+      contentCardId: taskData.contentCardId,
+      contentCardTitle: taskData.contentCardTitle,
+      contentType: taskData.contentType,
+      assignee: taskData.assignee || "Unassigned",
+      dueDate: taskData.dueDate,
+      createdAt: new Date().toISOString().split("T")[0],
+      ...taskData,
+    };
+
+    setTasks((prev) => [newTask, ...prev]);
+    return newTask;
+  }, []);
+
+  const toggleTaskStatus = useCallback((taskId: string) => {
+    setTasks((prev) =>
+      prev.map((t) => {
+        if (t.id !== taskId) return t;
+        const newStatus = t.status === "done" ? "todo" : "done";
+        return {
+          ...t,
+          status: newStatus,
+          completedAt: newStatus === "done" ? new Date().toISOString() : undefined,
+        };
+      })
+    );
+  }, []);
+
+  const updateTask = useCallback((updatedTask: TaskItem) => {
+    setTasks((prev) =>
+      prev.map((t) => (t.id === updatedTask.id ? updatedTask : t))
+    );
+  }, []);
+
+  const deleteTask = useCallback((taskId: string) => {
+    setTasks((prev) => prev.filter((t) => t.id !== taskId));
+  }, []);
+
   return (
     <ContentContext.Provider
       value={{
@@ -228,6 +333,11 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
         setIsCreateModalOpen,
         isDbConnected,
         isSyncing,
+        tasks,
+        addTask,
+        toggleTaskStatus,
+        updateTask,
+        deleteTask,
       }}
     >
       {children}

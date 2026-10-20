@@ -18,14 +18,16 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { setIsCreateModalOpen, cards } = useContent();
+  const { setIsCreateModalOpen, cards, tasks } = useContent();
 
   const isHomeActive = pathname === "/home" || pathname === "/";
   const isContentActive = pathname.startsWith("/content");
+  const isTasksActive = pathname.startsWith("/tasks");
   const isCalendarActive = pathname.startsWith("/calendar");
 
   const pendingReviewCount = cards.filter((c) => c.status === "For Review").length;
   const scheduledCount = cards.filter((c) => Boolean(c.scheduledDate)).length;
+  const openTasksCount = (tasks || []).filter((t) => t.status !== "done").length;
 
   const navItems = [
     {
@@ -43,9 +45,10 @@ export function Sidebar() {
     },
     {
       label: "Tasks",
-      href: "/content",
+      href: "/tasks",
       icon: CheckSquare,
-      isActive: false,
+      isActive: isTasksActive,
+      badge: openTasksCount > 0 ? String(openTasksCount) : undefined,
     },
     {
       label: "Calendar",

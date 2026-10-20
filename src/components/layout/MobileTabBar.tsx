@@ -8,7 +8,7 @@ import {
   SlidersHorizontal,
   Plus,
   Calendar,
-  BarChart3,
+  CheckSquare,
 } from "lucide-react";
 import { useContent } from "@/context/ContentContext";
 
@@ -19,6 +19,7 @@ export function MobileTabBar() {
   const isHomeActive = pathname === "/home" || pathname === "/";
   const isContentActive = pathname.startsWith("/content");
   const isCalendarActive = pathname.startsWith("/calendar");
+  const isTasksActive = pathname.startsWith("/tasks");
 
   return (
     <nav
@@ -109,19 +110,30 @@ export function MobileTabBar() {
           </span>
         </Link>
 
-        {/* 5. Insights Tab */}
-        <button
-          type="button"
-          onClick={() => {}}
-          className="flex-1 flex flex-col items-center justify-center py-1 group active:scale-95 transition-transform cursor-pointer"
+        {/* 5. Tasks Tab */}
+        <Link
+          href="/tasks"
+          className="flex-1 flex flex-col items-center justify-center py-1 group active:scale-95 transition-transform"
         >
-          <div className="text-gray-400 dark:text-[#8A8680] group-hover:text-gray-600 dark:group-hover:text-[#F5F3EF] transition-colors">
-            <BarChart3 className="w-5 h-5 stroke-[2.2]" />
+          <div
+            className={`transition-colors ${
+              isTasksActive
+                ? "text-[#8E4128]"
+                : "text-gray-400 dark:text-[#8A8680] group-hover:text-gray-600 dark:group-hover:text-[#F5F3EF]"
+            }`}
+          >
+            <CheckSquare className="w-5 h-5 stroke-[2.2]" />
           </div>
-          <span className="text-[10px] font-medium tracking-tight mt-0.5 leading-none text-gray-400 dark:text-[#8A8680]">
-            Insights
+          <span
+            className={`text-[10px] font-medium tracking-tight mt-0.5 leading-none transition-colors ${
+              isTasksActive
+                ? "text-[#8E4128] font-bold"
+                : "text-gray-400 dark:text-[#8A8680]"
+            }`}
+          >
+            Tasks
           </span>
-        </button>
+        </Link>
       </div>
     </nav>
   );
