@@ -34,17 +34,17 @@ export function Header({ showBoardFilters = false }: HeaderProps) {
     <div className="w-full flex flex-col items-center">
       {/* Mobile Floating Top Bar */}
       <div className="md:hidden w-full px-3.5 pt-3 pb-1">
-        <div className="w-full bg-white/80 backdrop-blur-xl rounded-2xl border border-black/[0.08] shadow-[0_2px_10px_rgba(0,0,0,0.04)] p-2.5 flex items-center justify-between">
+        <div className="w-full bg-white/80 dark:bg-[#131414]/90 backdrop-blur-xl rounded-2xl border border-black/[0.08] dark:border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.04)] p-2.5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-900 border border-black/10 flex-shrink-0">
+            <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-900 border border-black/10 dark:border-white/10 flex-shrink-0 p-1">
               <img
                 src="/avatar.webp"
                 alt="Clericlabs"
-                className="w-full h-full object-cover object-center"
+                className="w-full h-full object-contain"
               />
             </div>
             <div>
-              <span className="text-[13px] font-bold text-[#111110] block leading-none font-mono">
+              <span className="text-[13px] font-bold text-[#111110] dark:text-[#F5F3EF] block leading-none font-mono">
                 CLERICLABS
               </span>
               <span className="text-[10px] text-[#8A8680] font-medium leading-none">
@@ -78,7 +78,7 @@ export function Header({ showBoardFilters = false }: HeaderProps) {
                 <span className="block text-[10px] font-bold text-[#8A8680] uppercase tracking-[0.15em] leading-none mb-1 font-mono">
                   WORKFLOW
                 </span>
-                <h1 className="text-2xl font-black text-[#111110] tracking-tight">
+                <h1 className="text-2xl font-black text-[#111110] dark:text-[#F5F3EF] tracking-tight">
                   Board
                 </h1>
               </div>
@@ -102,7 +102,7 @@ export function Header({ showBoardFilters = false }: HeaderProps) {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Filter cards..."
-                  className="w-full bg-white/80 border border-black/[0.08] rounded-xl pl-8 pr-3 py-1.5 text-xs text-[#111110] placeholder-[#8A8680] outline-none focus:border-[#8E4128]/40 shadow-xs backdrop-blur-sm"
+                  className="w-full bg-white/80 dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/10 rounded-xl pl-8 pr-3 py-1.5 text-xs text-[#111110] dark:text-[#F5F3EF] placeholder-[#8A8680] outline-none focus:border-[#8E4128]/40 shadow-xs backdrop-blur-sm"
                 />
               </div>
 
@@ -117,7 +117,7 @@ export function Header({ showBoardFilters = false }: HeaderProps) {
                       className={`text-xs font-medium px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-all whitespace-nowrap cursor-pointer ${
                         isActive
                           ? "bg-[#8E4128] text-white font-semibold shadow-xs"
-                          : "bg-white/80 text-[#6E6B66] border border-black/[0.08] hover:bg-white hover:text-[#111110]"
+                          : "bg-white/80 dark:bg-white/[0.04] text-[#6E6B66] dark:text-[#8A8680] border border-black/[0.08] dark:border-white/10 hover:bg-white dark:hover:bg-white/[0.08] hover:text-[#111110] dark:hover:text-[#F5F3EF]"
                       }`}
                     >
                       <span>{tab.label}</span>
@@ -130,7 +130,7 @@ export function Header({ showBoardFilters = false }: HeaderProps) {
                 <select
                   value={selectedWriter}
                   onChange={(e) => setSelectedWriter(e.target.value)}
-                  className="appearance-none bg-white/80 border border-black/[0.08] rounded-xl pl-3 pr-7 py-1.5 text-xs font-medium text-[#111110] outline-none hover:bg-white cursor-pointer shadow-xs"
+                  className="appearance-none bg-white/80 dark:bg-[#131414] border border-black/[0.08] dark:border-white/10 rounded-xl pl-3 pr-7 py-1.5 text-xs font-medium text-[#111110] dark:text-[#F5F3EF] outline-none hover:bg-white dark:hover:bg-[#1a1a1a] cursor-pointer shadow-xs"
                 >
                   <option value="All Writers">All Writers</option>
                   <option value="Nick">Nick</option>

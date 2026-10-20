@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -10,18 +10,15 @@ import {
   Calendar,
   BarChart3,
   Plus,
-  Moon,
-  Sun,
   Bell,
-  Settings,
   LogOut,
 } from "lucide-react";
 import { useContent } from "@/context/ContentContext";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export function Sidebar() {
   const pathname = usePathname();
   const { setIsCreateModalOpen, cards } = useContent();
-  const [isDark, setIsDark] = useState(false);
 
   const isHomeActive = pathname === "/home" || pathname === "/";
   const isContentActive = pathname.startsWith("/content");
@@ -63,19 +60,19 @@ export function Sidebar() {
   ];
 
   return (
-    <aside className="hidden md:flex fixed top-4 left-4 bottom-4 w-60 z-50 rounded-3xl bg-white/75 backdrop-blur-2xl border border-black/[0.08] shadow-[0_20px_50px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,0.4)] flex-col justify-between p-4 transition-all overflow-hidden group select-none">
+    <aside className="hidden md:flex fixed top-4 left-4 bottom-4 w-60 z-50 rounded-3xl bg-white/75 dark:bg-white/[0.04] backdrop-blur-2xl border border-black/[0.08] dark:border-white/[0.14] shadow-[0_20px_50px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,0.4)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.15)] flex-col justify-between p-4 transition-all overflow-hidden group select-none">
       {/* Specular glass reflection at top */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-white/[0.12] to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-white/[0.12] dark:from-white/[0.06] to-transparent" />
 
       {/* Internal ambient aura */}
-      <div className="pointer-events-none absolute -top-10 -left-10 w-36 h-36 bg-[#8E4128]/10 rounded-full blur-2xl" />
-      <div className="pointer-events-none absolute -bottom-10 -right-10 w-36 h-36 bg-[#8E4128]/10 rounded-full blur-2xl" />
+      <div className="pointer-events-none absolute -top-10 -left-10 w-36 h-36 bg-[#8E4128]/10 dark:bg-[#8E4128]/20 rounded-full blur-2xl" />
+      <div className="pointer-events-none absolute -bottom-10 -right-10 w-36 h-36 bg-[#8E4128]/10 dark:bg-[#8E4128]/20 rounded-full blur-2xl" />
 
       {/* Top Section */}
       <div className="space-y-4 relative z-10">
         {/* Workspace Brand Pill */}
         <div className="flex items-center gap-2.5 px-1 py-1">
-          <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-900 border border-black/10 shrink-0 flex items-center justify-center shadow-sm p-1">
+          <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-900 border border-black/10 dark:border-white/10 shrink-0 flex items-center justify-center shadow-sm p-1">
             <img
               src="/avatar.webp"
               alt="Clericlabs"
@@ -83,10 +80,10 @@ export function Sidebar() {
             />
           </div>
           <div className="min-w-0">
-            <h2 className="text-xs font-bold text-[#111110] truncate tracking-tight uppercase font-mono">
+            <h2 className="text-xs font-bold text-[#111110] dark:text-[#F5F3EF] truncate tracking-tight uppercase font-mono">
               CLERICLABS
             </h2>
-            <p className="text-[10px] text-[#6E6B66] truncate font-medium">
+            <p className="text-[10px] text-[#6E6B66] dark:text-[#8A8680] truncate font-medium">
               Content OS
             </p>
           </div>
@@ -116,7 +113,7 @@ export function Sidebar() {
                 className={`relative w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs transition-all overflow-hidden ${
                   isActive
                     ? "bg-gradient-to-b from-[#8E4128]/90 to-[#6E2E1A]/90 border border-[#D97755]/50 text-white font-semibold shadow-[inset_0_1px_1px_rgba(255,255,255,0.35),0_4px_12px_rgba(127,57,34,0.3)]"
-                    : "text-[#6E6B66] hover:text-[#111110] hover:bg-black/5 font-medium"
+                    : "text-[#6E6B66] dark:text-[#8A8680] hover:text-[#111110] dark:hover:text-[#F5F3EF] hover:bg-black/5 dark:hover:bg-white/[0.05] font-medium"
                 }`}
               >
                 {isActive && (
@@ -125,7 +122,7 @@ export function Sidebar() {
                 <div className="flex items-center gap-3 relative z-10">
                   <Icon
                     className={`w-4 h-4 shrink-0 ${
-                      isActive ? "text-white stroke-[2.2]" : "text-[#6E6B66]"
+                      isActive ? "text-white stroke-[2.2]" : "text-[#6E6B66] dark:text-[#8A8680]"
                     }`}
                   />
                   <span className="truncate">{item.label}</span>
@@ -135,7 +132,7 @@ export function Sidebar() {
                     className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full relative z-10 ${
                       isActive
                         ? "bg-white/20 text-white font-bold"
-                        : "bg-black/5 text-[#6E6B66]"
+                        : "bg-black/5 dark:bg-white/10 text-[#6E6B66] dark:text-[#8A8680]"
                     }`}
                   >
                     {item.badge}
@@ -148,27 +145,20 @@ export function Sidebar() {
       </div>
 
       {/* Bottom Controls (Matching Agency OS Footer) */}
-      <div className="pt-3 border-t border-[#ECE8E1] relative z-10">
+      <div className="pt-3 border-t border-[#ECE8E1] dark:border-white/10 relative z-10">
         <div className="flex items-center justify-between px-2">
-          {/* Theme toggle preview icon */}
-          <button
-            type="button"
-            onClick={() => setIsDark((prev) => !prev)}
-            title="Toggle theme"
-            className="w-8 h-8 rounded-full flex items-center justify-center text-[#6E6B66] hover:text-[#111110] hover:bg-black/5 transition-colors cursor-pointer"
-          >
-            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
+          {/* Real Next-Themes Theme Toggle */}
+          <ThemeToggle />
 
           {/* Notification bell */}
           <button
             type="button"
             title="Notifications"
-            className="relative w-8 h-8 rounded-full flex items-center justify-center text-[#6E6B66] hover:text-[#111110] hover:bg-black/5 transition-colors cursor-pointer"
+            className="relative w-8 h-8 rounded-full flex items-center justify-center text-[#6E6B66] dark:text-[#8A8680] hover:text-[#111110] dark:hover:text-[#F5F3EF] hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
           >
             <Bell className="w-4 h-4" />
             {pendingReviewCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#E04F2E] ring-2 ring-white" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#E04F2E] ring-2 ring-white dark:ring-[#131414]" />
             )}
           </button>
 
@@ -176,7 +166,7 @@ export function Sidebar() {
           <button
             type="button"
             title="Sign out / Settings"
-            className="w-8 h-8 rounded-full flex items-center justify-center text-[#6E6B66] hover:text-[#111110] hover:bg-black/5 transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-[#6E6B66] dark:text-[#8A8680] hover:text-[#111110] dark:hover:text-[#F5F3EF] hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
           </button>

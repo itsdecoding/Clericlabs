@@ -81,26 +81,26 @@ export default function HomePage() {
 
       <main className="px-4 sm:px-6 md:px-8 max-w-[1440px] mx-auto space-y-6 pt-2">
         {/* ========================================================================= */}
-        {/* 1. COMMAND CENTER HEADER (Agency OS Clean Title Block)                    */}
+        {/* 1. COMMAND CENTER HEADER (Agency OS Dark Mode Title Block)                */}
         {/* ========================================================================= */}
-        <div className="pb-4 border-b border-[#ECE8E1] pt-1 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="pb-4 border-b border-[#ECE8E1] dark:border-[#262420] pt-1 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <span className="text-[11px] font-bold tracking-[0.15em] uppercase text-[#8A8680] block font-mono">
               COMMAND CENTER
             </span>
-            <h1 className="text-3xl sm:text-4xl font-black text-[#111110] tracking-tight mt-0.5">
+            <h1 className="text-3xl sm:text-4xl font-black text-[#111110] dark:text-[#F5F3EF] tracking-tight mt-0.5">
               Dashboard
             </h1>
-            <p suppressHydrationWarning className="text-xs font-mono text-[#6E6B66] pt-0.5">
+            <p suppressHydrationWarning className="text-xs font-mono text-[#6E6B66] dark:text-[#8A8680] pt-0.5">
               {currentTime || "Content Production Operations • Clericlabs"}
             </p>
           </div>
         </div>
 
         {/* ========================================================================= */}
-        {/* 2. PIPELINE & EDITORIAL SNAPSHOT (Agency OS Metric Cards)                */}
+        {/* 2. PIPELINE & EDITORIAL SNAPSHOT (Agency OS Dark Mode Cards)             */}
         {/* ========================================================================= */}
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-black/[0.08] p-5 shadow-xs space-y-4">
+        <div className="bg-white/80 dark:bg-white/[0.03] backdrop-blur-md rounded-2xl border border-black/[0.08] dark:border-white/[0.08] p-5 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
             <span className="text-[10.5px] font-mono font-bold tracking-wider text-[#8E4128] uppercase">
               PIPELINE & EDITORIAL SNAPSHOT
@@ -109,65 +109,65 @@ export default function HomePage() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             {/* Card 1: In Production */}
-            <div className="p-4 rounded-xl bg-[#FAF8F5] border border-black/[0.06] flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-[#FAF8F5] dark:bg-[#181715] border border-black/[0.06] dark:border-[#2D2924] flex flex-col justify-between">
               <div className="flex items-center justify-between text-[#8A8680] mb-2">
                 <span className="text-[11px] font-mono font-bold uppercase tracking-wider">
                   IN PRODUCTION
                 </span>
                 <Film className="w-3.5 h-3.5 text-[#8E4128]" />
               </div>
-              <div className="text-3xl font-black text-[#111110] font-mono leading-none">
+              <div className="text-3xl font-black text-[#111110] dark:text-[#F5F3EF] font-mono leading-none">
                 {activePipeline}
               </div>
-              <p className="text-[11px] text-[#6E6B66] mt-2 truncate font-medium">
+              <p className="text-[11px] text-[#6E6B66] dark:text-[#8A8680] mt-2 truncate font-medium">
                 Active scripts & edits in flight
               </p>
             </div>
 
             {/* Card 2: Needs Review */}
-            <div className="p-4 rounded-xl bg-[#FAF8F5] border border-black/[0.06] flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-[#FAF8F5] dark:bg-[#181715] border border-black/[0.06] dark:border-[#2D2924] flex flex-col justify-between">
               <div className="flex items-center justify-between text-[#8A8680] mb-2">
                 <span className="text-[11px] font-mono font-bold uppercase tracking-wider">
                   NEEDS REVIEW
                 </span>
                 <Flame className="w-3.5 h-3.5 text-[#E04F2E]" />
               </div>
-              <div className="text-3xl font-black text-[#111110] font-mono leading-none">
+              <div className="text-3xl font-black text-[#111110] dark:text-[#F5F3EF] font-mono leading-none">
                 {reviewCount}
               </div>
-              <p className="text-[11px] text-[#6E6B66] mt-2 truncate font-medium">
+              <p className="text-[11px] text-[#6E6B66] dark:text-[#8A8680] mt-2 truncate font-medium">
                 Pending editorial approval
               </p>
             </div>
 
             {/* Card 3: Published */}
-            <div className="p-4 rounded-xl bg-[#FAF8F5] border border-black/[0.06] flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-[#FAF8F5] dark:bg-[#181715] border border-black/[0.06] dark:border-[#2D2924] flex flex-col justify-between">
               <div className="flex items-center justify-between text-[#8A8680] mb-2">
                 <span className="text-[11px] font-mono font-bold uppercase tracking-wider">
                   PUBLISHED
                 </span>
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#2E7D32]" />
               </div>
-              <div className="text-3xl font-black text-[#111110] font-mono leading-none">
+              <div className="text-3xl font-black text-[#111110] dark:text-[#F5F3EF] font-mono leading-none">
                 {postedCount}
               </div>
-              <p className="text-[11px] text-[#6E6B66] mt-2 truncate font-medium">
+              <p className="text-[11px] text-[#6E6B66] dark:text-[#8A8680] mt-2 truncate font-medium">
                 Total pieces live across channels
               </p>
             </div>
 
             {/* Card 4: Radar Ideas */}
-            <div className="p-4 rounded-xl bg-[#FAF8F5] border border-black/[0.06] flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-[#FAF8F5] dark:bg-[#181715] border border-black/[0.06] dark:border-[#2D2924] flex flex-col justify-between">
               <div className="flex items-center justify-between text-[#8A8680] mb-2">
                 <span className="text-[11px] font-mono font-bold uppercase tracking-wider">
                   RADAR IDEAS
                 </span>
                 <Compass className="w-3.5 h-3.5 text-[#8A8680]" />
               </div>
-              <div className="text-3xl font-black text-[#111110] font-mono leading-none">
+              <div className="text-3xl font-black text-[#111110] dark:text-[#F5F3EF] font-mono leading-none">
                 {radarIdeas}
               </div>
-              <p className="text-[11px] text-[#6E6B66] mt-2 truncate font-medium">
+              <p className="text-[11px] text-[#6E6B66] dark:text-[#8A8680] mt-2 truncate font-medium">
                 Backlog ready for scripting
               </p>
             </div>
@@ -175,13 +175,13 @@ export default function HomePage() {
         </div>
 
         {/* ========================================================================= */}
-        {/* 3. PRIORITY / ACTION QUEUE (Agency OS Lead Card Style)                   */}
+        {/* 3. PRIORITY / ACTION QUEUE (Agency OS Dark Mode Lead Cards)              */}
         {/* ========================================================================= */}
-        <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-black/[0.08] p-5 shadow-xs space-y-4">
+        <div className="bg-white/80 dark:bg-white/[0.03] backdrop-blur-md rounded-2xl border border-black/[0.08] dark:border-white/[0.08] p-5 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Flame className="w-4 h-4 text-[#8E4128]" />
-              <h3 className="text-sm font-bold text-[#111110]">
+              <h3 className="text-sm font-bold text-[#111110] dark:text-[#F5F3EF]">
                 Priority Editorial Queue{" "}
                 <span className="text-[#8E4128] font-mono">({reviewCount})</span>
               </h3>
@@ -196,9 +196,9 @@ export default function HomePage() {
           </div>
 
           {needsReviewItems.length === 0 ? (
-            <div className="py-10 text-center rounded-xl bg-[#FAF8F5] border border-dashed border-black/10">
+            <div className="py-10 text-center rounded-xl bg-[#FAF8F5] dark:bg-[#181715]/60 border border-dashed border-black/10 dark:border-white/10">
               <CheckCircle2 className="w-6 h-6 text-[#2E7D32] mx-auto mb-2" />
-              <p className="text-xs font-semibold text-[#111110]">All editorial reviews clear</p>
+              <p className="text-xs font-semibold text-[#111110] dark:text-[#F5F3EF]">All editorial reviews clear</p>
               <p className="text-[11px] text-[#8A8680] mt-0.5">
                 No drafts are currently blocked waiting for sign-off.
               </p>
@@ -215,21 +215,21 @@ export default function HomePage() {
               {needsReviewItems.map((item) => (
                 <div
                   key={item.id}
-                  className="p-4 rounded-xl bg-white border border-black/[0.08] hover:border-[#8E4128]/40 transition-all shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
+                  className="p-4 rounded-xl bg-white dark:bg-[#131414] border border-black/[0.08] dark:border-[#262420] hover:border-[#8E4128]/50 transition-all shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#FAF8F5] text-[#6E6B66] border border-black/5">
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#FAF8F5] dark:bg-white/[0.06] text-[#6E6B66] dark:text-[#8A8680] border border-black/5 dark:border-white/5">
                         {item.type}
                       </span>
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#FEF9EE] text-[#B47D14] flex items-center gap-1">
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#FEF9EE] dark:bg-[#F59E0B]/10 text-[#B47D14] dark:text-[#FBBF24] flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
                         {item.status}
                       </span>
                     </div>
                     <Link
                       href={`/content/${item.id}`}
-                      className="text-sm font-bold text-[#111110] group-hover:text-[#8E4128] transition-colors line-clamp-1"
+                      className="text-sm font-bold text-[#111110] dark:text-[#F5F3EF] group-hover:text-[#8E4128] transition-colors line-clamp-1"
                     >
                       {item.title}
                     </Link>
@@ -245,7 +245,7 @@ export default function HomePage() {
                     </button>
                     <Link
                       href={`/content/${item.id}`}
-                      className="px-3 py-1.5 rounded-full bg-[#FAF8F5] hover:bg-[#F3EFEA] text-[#111110] text-xs font-semibold border border-black/10 transition-colors"
+                      className="px-3 py-1.5 rounded-full bg-[#FAF8F5] dark:bg-white/[0.05] hover:bg-[#F3EFEA] dark:hover:bg-white/[0.1] text-[#111110] dark:text-[#D4D2D0] text-xs font-semibold border border-black/10 dark:border-white/10 transition-colors"
                     >
                       Inspect
                     </Link>
@@ -257,52 +257,52 @@ export default function HomePage() {
         </div>
 
         {/* ========================================================================= */}
-        {/* 4. BREAKDOWNS: By Channel & By Status                                     */}
+        {/* 4. BREAKDOWNS: By Channel & By Status (Dark Mode Support)                 */}
         {/* ========================================================================= */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* By Channel */}
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-black/[0.08] p-5 shadow-xs space-y-3">
+          <div className="bg-white/80 dark:bg-white/[0.03] backdrop-blur-md rounded-2xl border border-black/[0.08] dark:border-white/[0.08] p-5 shadow-xs space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#8A8680]">
                 Volume By Channel
               </h3>
               <span className="text-xs font-mono text-[#8A8680]">Live count</span>
             </div>
-            <div className="divide-y divide-[#ECE8E1]">
+            <div className="divide-y divide-[#ECE8E1] dark:divide-white/10">
               {contentTypes.map((channel) => (
                 <div
                   key={channel.name}
-                  className="py-2.5 flex items-center justify-between text-xs hover:bg-[#FAF8F5] px-2 rounded-lg transition-colors"
+                  className="py-2.5 flex items-center justify-between text-xs hover:bg-[#FAF8F5] dark:hover:bg-white/[0.03] px-2 rounded-lg transition-colors"
                 >
-                  <span className="font-medium text-[#111110]">{channel.name}</span>
-                  <span className="font-mono font-bold text-[#111110]">{channel.count}</span>
+                  <span className="font-medium text-[#111110] dark:text-[#F5F3EF]">{channel.name}</span>
+                  <span className="font-mono font-bold text-[#111110] dark:text-[#F5F3EF]">{channel.count}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* By Status */}
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-black/[0.08] p-5 shadow-xs space-y-3">
+          <div className="bg-white/80 dark:bg-white/[0.03] backdrop-blur-md rounded-2xl border border-black/[0.08] dark:border-white/[0.08] p-5 shadow-xs space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-[#8A8680]">
                 Production Stage Distribution
               </h3>
               <span className="text-xs font-mono text-[#8A8680]">Workflow</span>
             </div>
-            <div className="divide-y divide-[#ECE8E1]">
+            <div className="divide-y divide-[#ECE8E1] dark:divide-white/10">
               {statusStats.map((st) => (
                 <div
                   key={st.name}
-                  className="py-2.5 flex items-center justify-between text-xs hover:bg-[#FAF8F5] px-2 rounded-lg transition-colors"
+                  className="py-2.5 flex items-center justify-between text-xs hover:bg-[#FAF8F5] dark:hover:bg-white/[0.03] px-2 rounded-lg transition-colors"
                 >
                   <div className="flex items-center gap-2">
                     <span
                       className="w-2 h-2 rounded-full"
                       style={{ backgroundColor: st.colorDot }}
                     />
-                    <span className="font-medium text-[#111110]">{st.name}</span>
+                    <span className="font-medium text-[#111110] dark:text-[#F5F3EF]">{st.name}</span>
                   </div>
-                  <span className="font-mono font-bold text-[#111110]">{st.count}</span>
+                  <span className="font-mono font-bold text-[#111110] dark:text-[#F5F3EF]">{st.count}</span>
                 </div>
               ))}
             </div>

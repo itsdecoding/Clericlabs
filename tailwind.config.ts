@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,27 +10,25 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#FBF9F5",
-        brand: {
-          DEFAULT: "#FF5A1F",
-          hover: "#E84C12",
-          light: "#FFF4EF",
-          border: "#FFD6C5",
+        canvas: {
+          light: "#F7F5F0",
+          dark: "#0E0E0E",
         },
-        card: "#FFFFFF",
-        textPrimary: "#1A1A1A",
-        textSecondary: "#6B7280",
-        borderSubtle: "#E5E7EB",
+        surface: {
+          light: "#FFFFFF",
+          dark: "#131414",
+          darkElevated: "#181818",
+        },
+        brand: {
+          DEFAULT: "#8E4128",
+          hover: "#6E2E1A",
+          rust: "#7F3922",
+        },
       },
       borderRadius: {
         "3xl": "1.75rem",
         "2xl": "1.25rem",
         xl: "0.875rem",
-      },
-      boxShadow: {
-        card: "0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03)",
-        sidebar: "0 4px 20px -2px rgba(0, 0, 0, 0.03), 0 2px 6px -1px rgba(0, 0, 0, 0.02)",
-        command: "0 10px 25px -5px rgba(0, 0, 0, 0.06), 0 8px 10px -6px rgba(0, 0, 0, 0.03)",
       },
       fontFamily: {
         sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
