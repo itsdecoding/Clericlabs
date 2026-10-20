@@ -172,9 +172,6 @@ export default function HomePage() {
             <span className="text-[10.5px] font-mono font-bold tracking-wider text-[#8E4128] uppercase">
               PIPELINE & EDITORIAL SNAPSHOT
             </span>
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-[#E8F5E9] text-[#2E7D32] border border-[#C8E6C9]">
-              {activePipeline} in play
-            </span>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">

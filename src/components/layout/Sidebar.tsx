@@ -75,19 +75,19 @@ export function Sidebar() {
       <div className="space-y-4 relative z-10">
         {/* Workspace Brand Pill */}
         <div className="flex items-center gap-2.5 px-1 py-1">
-          <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-900 border border-black/10 shrink-0 flex items-center justify-center shadow-sm">
+          <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-900 border border-black/10 shrink-0 flex items-center justify-center shadow-sm p-1">
             <img
               src="/avatar.webp"
               alt="Clericlabs"
-              className="w-full h-full object-cover object-center"
+              className="w-full h-full object-contain"
             />
           </div>
           <div className="min-w-0">
             <h2 className="text-xs font-bold text-[#111110] truncate tracking-tight uppercase font-mono">
-              MUZAMMIL (ADMIN)
+              CLERICLABS
             </h2>
             <p className="text-[10px] text-[#6E6B66] truncate font-medium">
-              Clericlabs OS • <span className="capitalize">Admin</span>
+              Content OS
             </p>
           </div>
         </div>
