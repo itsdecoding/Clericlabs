@@ -8,7 +8,7 @@ import {
   SlidersHorizontal,
   CheckSquare,
   Calendar,
-  BarChart3,
+  Radar,
   Plus,
   Bell,
   LogOut,
@@ -18,17 +18,18 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { setIsCreateModalOpen, cards, tasks } = useContent();
+  const { setIsCreateModalOpen, cards, tasks, signals } = useContent();
 
   const isHomeActive = pathname === "/home" || pathname === "/";
   const isContentActive = pathname.startsWith("/content");
   const isTasksActive = pathname.startsWith("/tasks");
   const isCalendarActive = pathname.startsWith("/calendar");
-  const isInsightsActive = pathname.startsWith("/insights");
+  const isRadarActive = pathname.startsWith("/radar");
 
   const pendingReviewCount = cards.filter((c) => c.status === "For Review").length;
   const scheduledCount = cards.filter((c) => Boolean(c.scheduledDate)).length;
   const openTasksCount = (tasks || []).filter((t) => t.status !== "done").length;
+  const radarSignalsCount = (signals || []).filter((s) => !s.isPromoted).length;
 
   const navItems = [
     {
@@ -59,10 +60,11 @@ export function Sidebar() {
       badge: scheduledCount > 0 ? String(scheduledCount) : undefined,
     },
     {
-      label: "Insights",
-      href: "/insights",
-      icon: BarChart3,
-      isActive: isInsightsActive,
+      label: "Radar",
+      href: "/radar",
+      icon: Radar,
+      isActive: isRadarActive,
+      badge: radarSignalsCount > 0 ? String(radarSignalsCount) : undefined,
     },
   ];
 

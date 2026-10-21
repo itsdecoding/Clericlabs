@@ -9,7 +9,7 @@ import {
   LayoutDashboard,
   CheckSquare,
   Calendar,
-  BarChart3,
+  Radar,
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -83,11 +83,11 @@ export function CommandBar() {
       },
     },
     {
-      label: "View Studio Insights & Telemetry",
-      icon: BarChart3,
+      label: "Open Content Radar & Viral Signals",
+      icon: Radar,
       category: "Navigation",
       action: () => {
-        router.push("/insights");
+        router.push("/radar");
         setIsOpen(false);
       },
     },

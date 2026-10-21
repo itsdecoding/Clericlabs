@@ -21,7 +21,7 @@ export default function ContentBoardPage() {
     setIsCreateModalOpen,
   } = useContent();
 
-  const [activeColumnTab, setActiveColumnTab] = useState<string>("Idea");
+  const [activeColumnTab, setActiveColumnTab] = useState<string>("Radar");
   const [viewMode, setViewMode] = useState<"Board" | "List">("Board");
   const [draggedCardId, setDraggedCardId] = useState<string | null>(null);
 
@@ -70,7 +70,10 @@ export default function ContentBoardPage() {
     }
   };
 
-  const mobileColumnCards = filteredCards.filter((c) => c.status === activeColumnTab);
+  const mobileColumnCards = filteredCards.filter((c) => {
+    if (activeColumnTab === "Radar") return c.status === "Radar" || c.status === "Idea";
+    return c.status === activeColumnTab;
+  });
 
   return (
     <div className="min-h-screen flex flex-col pb-20 md:pb-8">
@@ -273,7 +276,10 @@ export default function ContentBoardPage() {
       <main className="hidden md:flex flex-1 px-8 pb-8 overflow-x-auto">
         <div className="flex gap-4 min-w-max pb-4 items-start">
           {COLUMNS.map((col) => {
-            const columnCards = filteredCards.filter((c) => c.status === col.id);
+            const columnCards = filteredCards.filter((c) => {
+              if (col.id === "Radar") return c.status === "Radar" || c.status === "Idea";
+              return c.status === col.id;
+            });
 
             return (
               <div

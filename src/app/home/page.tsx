@@ -47,7 +47,7 @@ export default function HomePage() {
   const totalContent = cards.length;
   const activePipeline = cards.filter((c) => c.status !== "Posted" && c.status !== "Dismissed").length;
   const postedCount = cards.filter((c) => c.status === "Posted").length;
-  const radarIdeas = cards.filter((c) => c.status === "Idea").length;
+  const radarIdeas = cards.filter((c) => c.status === "Radar" || c.status === "Idea").length;
   const reviewCount = needsReviewItems.length;
 
   const contentTypes = [
@@ -60,7 +60,7 @@ export default function HomePage() {
   ];
 
   const statusDefs = [
-    { name: "Idea", colorDot: "#9CA3AF" },
+    { name: "Radar", colorDot: "#8E4128" },
     { name: "Scripting", colorDot: "#60A5FA" },
     { name: "Filming (Approved)", colorDot: "#F472B6" },
     { name: "In Editing", colorDot: "#8E4128" },

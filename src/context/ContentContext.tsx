@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { ContentCard, TaskItem, INITIAL_CARDS, INITIAL_TASKS } from "@/data/mockData";
+import { ContentCard, TaskItem, RadarSignal, INITIAL_CARDS, INITIAL_TASKS, INITIAL_SIGNALS } from "@/data/mockData";
 import {
   fetchCardsFromDb,
   upsertCardInDb,
@@ -34,12 +34,17 @@ interface ContentContextType {
   toggleTaskStatus: (taskId: string) => void;
   updateTask: (updatedTask: TaskItem) => void;
   deleteTask: (taskId: string) => void;
+  signals: RadarSignal[];
+  addSignal: (signal: Partial<RadarSignal>) => RadarSignal;
+  deleteSignal: (id: string) => void;
+  promoteSignalToCard: (signalId: string, contentType?: string) => ContentCard;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_KEY = "clericlabs_content_cards_v1";
 const TASKS_STORAGE_KEY = "clericlabs_tasks_v1";
+const SIGNALS_STORAGE_KEY = "clericlabs_radar_signals_v1";
 
 const getLocalDateStr = (d = new Date()) => {
   const year = d.getFullYear();
@@ -89,6 +94,7 @@ const DEFAULT_STARTER_TASKS: TaskItem[] = [
 export function ContentProvider({ children }: { children: React.ReactNode }) {
   const [cards, setCards] = useState<ContentCard[]>([]);
   const [tasks, setTasks] = useState<TaskItem[]>([]);
+  const [signals, setSignals] = useState<RadarSignal[]>([]);
   const [activeFilter, setActiveFilter] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedWriter, setSelectedWriter] = useState<string>("All Writers");
@@ -117,6 +123,17 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (e) {
       setTasks(DEFAULT_STARTER_TASKS);
+    }
+
+    try {
+      const storedSignals = localStorage.getItem(SIGNALS_STORAGE_KEY);
+      if (storedSignals !== null) {
+        setSignals(JSON.parse(storedSignals));
+      } else {
+        setSignals(INITIAL_SIGNALS);
+      }
+    } catch (e) {
+      setSignals(INITIAL_SIGNALS);
     }
 
     setIsLoaded(true);
@@ -158,8 +175,13 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
       } catch (e) {
         console.warn("Could not save tasks to localStorage", e);
       }
+      try {
+        localStorage.setItem(SIGNALS_STORAGE_KEY, JSON.stringify(signals));
+      } catch (e) {
+        console.warn("Could not save signals to localStorage", e);
+      }
     }
-  }, [cards, tasks, isLoaded]);
+  }, [cards, tasks, signals, isLoaded]);
 
   const updateCardStatus = useCallback((cardId: string, newStatus: string) => {
     setCards((prev) => {
@@ -320,6 +342,48 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
     setTasks((prev) => prev.filter((t) => t.id !== taskId));
   }, []);
 
+  const addSignal = useCallback((signalData: Partial<RadarSignal>) => {
+    const newSignal: RadarSignal = {
+      id: "sig-" + Date.now(),
+      title: signalData.title || "Untitled Signal",
+      source: signalData.source || "X / Twitter",
+      signalType: signalData.signalType || "Viral Hook",
+      conviction: signalData.conviction || "High",
+      notes: signalData.notes || "",
+      tags: signalData.tags || "",
+      createdAt: getLocalDateStr(),
+      isPromoted: false,
+      ...signalData,
+    };
+    setSignals((prev) => [newSignal, ...prev]);
+    return newSignal;
+  }, []);
+
+  const deleteSignal = useCallback((id: string) => {
+    setSignals((prev) => prev.filter((s) => s.id !== id));
+  }, []);
+
+  const promoteSignalToCard = useCallback(
+    (signalId: string, contentType = "IG Carousel") => {
+      const signal = signals.find((s) => s.id === signalId);
+      const newCard = addCard({
+        title: signal ? signal.title : "New Radar Idea",
+        type: contentType,
+        status: "Radar",
+        category: signal?.tags?.includes("ai") ? "AI News" : "Mindset & Philosophy",
+        priority: signal?.conviction === "High" ? "High" : "Medium",
+        tags: signal?.tags,
+      });
+
+      setSignals((prev) =>
+        prev.map((s) => (s.id === signalId ? { ...s, isPromoted: true } : s))
+      );
+
+      return newCard;
+    },
+    [signals, addCard]
+  );
+
   return (
     <ContentContext.Provider
       value={{
@@ -346,6 +410,10 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
         toggleTaskStatus,
         updateTask,
         deleteTask,
+        signals,
+        addSignal,
+        deleteSignal,
+        promoteSignalToCard,
       }}
     >
       {children}

@@ -40,6 +40,52 @@ export interface TaskItem {
   completedAt?: string;
 }
 
+export interface RadarSignal {
+  id: string;
+  title: string;
+  source: string; // 'X / Twitter' | 'Instagram' | 'Substack' | 'YouTube' | 'Reddit' | 'Competitor'
+  sourceUrl?: string;
+  signalType: "Viral Hook" | "Content Angle" | "Competitor Watch" | "Trend / News";
+  conviction: "High" | "Medium" | "Seed";
+  notes?: string;
+  tags?: string;
+  createdAt: string;
+  isPromoted?: boolean;
+}
+
+export const INITIAL_SIGNALS: RadarSignal[] = [
+  {
+    id: "sig-1",
+    title: "The Architecture of Unshakeable Conviction: Why high agency founders ignore consensus",
+    source: "X / Twitter",
+    signalType: "Viral Hook",
+    conviction: "High",
+    notes: "Angle: High conviction isn't arrogance; it's asymmetrical information. Structure as 7 slides breaking down cognitive autonomy.",
+    tags: "philosophy, agency, mindset",
+    createdAt: "2026-10-21",
+  },
+  {
+    id: "sig-2",
+    title: "Why 90% of AI automation agencies will consolidate by Q4",
+    source: "Substack",
+    signalType: "Trend / News",
+    conviction: "High",
+    notes: "Core premise: Prompt wrappers die, vertical workflows win. Great hook for a multi-slide B2B breakdown.",
+    tags: "ai, business, systems",
+    createdAt: "2026-10-20",
+  },
+  {
+    id: "sig-3",
+    title: "The 4 Silent Scripts of People-Pleasing (And how to delete them)",
+    source: "Instagram",
+    signalType: "Content Angle",
+    conviction: "Medium",
+    notes: "Psychological breakdown. 4-step framework targeting emotional autonomy. Reel voiceover candidate.",
+    tags: "psychology, mindset",
+    createdAt: "2026-10-19",
+  },
+];
+
 export const INITIAL_TASKS: TaskItem[] = [];
 
 export const INITIAL_CARDS: ContentCard[] = [];
@@ -54,7 +100,7 @@ export const CONTENT_TYPE_STATS = [
 ];
 
 export const STATUS_STATS = [
-  { name: "Idea", count: 15, colorDot: "#9CA3AF", pillBg: "#F3F4F6", pillText: "#4B5563" },
+  { name: "Radar", count: 15, colorDot: "#8E4128", pillBg: "#FFF3EC", pillText: "#C43B1B" },
   { name: "Scripting", count: 22, colorDot: "#60A5FA", pillBg: "#EFF6FF", pillText: "#1D4ED8" },
   { name: "Filming (Approved)", count: 3, colorDot: "#F472B6", pillBg: "#FDF2F8", pillText: "#BE185D" },
   { name: "In Editing", count: 18, colorDot: "#8E4128", pillBg: "#FFF3EC", pillText: "#C43B1B" },
@@ -65,7 +111,7 @@ export const STATUS_STATS = [
 ];
 
 export const COLUMNS = [
-  { id: "Idea", title: "Idea", colorDot: "#6B7280" },
+  { id: "Radar", title: "Radar", colorDot: "#8E4128", isOrange: true },
   { id: "Scripting", title: "Scripting", colorDot: "#6B7280" },
   { id: "Filming (Approved)", title: "Filming (Approved)", colorDot: "#6B7280" },
   { id: "In Editing", title: "In Editing", colorDot: "#8E4128", isOrange: true },

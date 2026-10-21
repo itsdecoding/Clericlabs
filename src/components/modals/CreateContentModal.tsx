@@ -11,7 +11,7 @@ export function CreateContentModal() {
 
   const [title, setTitle] = useState("");
   const [type, setType] = useState("IG Carousel");
-  const [status, setStatus] = useState("Idea");
+  const [status, setStatus] = useState("Radar");
   const [category, setCategory] = useState("AI News");
   const [priority, setPriority] = useState("Medium");
   const [scheduledDate, setScheduledDate] = useState("");
@@ -103,7 +103,7 @@ export function CreateContentModal() {
                 onChange={(e) => setStatus(e.target.value)}
                 className="w-full bg-gray-50/70 dark:bg-[#181818] border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2.5 text-sm sm:text-xs font-medium text-gray-800 dark:text-[#F5F3EF] outline-none"
               >
-                <option value="Idea">Idea</option>
+                <option value="Radar">Radar</option>
                 <option value="Scripting">Scripting</option>
                 <option value="In Editing">In Editing</option>
                 <option value="For Review">For Review</option>
