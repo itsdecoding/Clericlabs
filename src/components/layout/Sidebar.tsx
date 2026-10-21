@@ -24,6 +24,7 @@ export function Sidebar() {
   const isContentActive = pathname.startsWith("/content");
   const isTasksActive = pathname.startsWith("/tasks");
   const isCalendarActive = pathname.startsWith("/calendar");
+  const isInsightsActive = pathname.startsWith("/insights");
 
   const pendingReviewCount = cards.filter((c) => c.status === "For Review").length;
   const scheduledCount = cards.filter((c) => Boolean(c.scheduledDate)).length;
@@ -59,9 +60,9 @@ export function Sidebar() {
     },
     {
       label: "Insights",
-      href: "/content",
+      href: "/insights",
       icon: BarChart3,
-      isActive: false,
+      isActive: isInsightsActive,
     },
   ];
 

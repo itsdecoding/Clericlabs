@@ -1,7 +1,17 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Search, Command, Plus, SlidersHorizontal, LayoutDashboard, X } from "lucide-react";
+import {
+  Search,
+  Command,
+  Plus,
+  SlidersHorizontal,
+  LayoutDashboard,
+  CheckSquare,
+  Calendar,
+  BarChart3,
+  X,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useContent } from "@/context/ContentContext";
 
@@ -51,6 +61,33 @@ export function CommandBar() {
       category: "Navigation",
       action: () => {
         router.push("/content");
+        setIsOpen(false);
+      },
+    },
+    {
+      label: "Open Operational Tasks",
+      icon: CheckSquare,
+      category: "Navigation",
+      action: () => {
+        router.push("/tasks");
+        setIsOpen(false);
+      },
+    },
+    {
+      label: "Open Editorial Calendar",
+      icon: Calendar,
+      category: "Navigation",
+      action: () => {
+        router.push("/calendar");
+        setIsOpen(false);
+      },
+    },
+    {
+      label: "View Studio Insights & Telemetry",
+      icon: BarChart3,
+      category: "Navigation",
+      action: () => {
+        router.push("/insights");
         setIsOpen(false);
       },
     },
