@@ -1,7 +1,18 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { ContentCard, TaskItem, RadarSignal, INITIAL_CARDS, INITIAL_TASKS, INITIAL_SIGNALS } from "@/data/mockData";
+import {
+  ContentCard,
+  TaskItem,
+  RadarSignal,
+  WatchlistAccount,
+  WeeklyOutlier,
+  INITIAL_CARDS,
+  INITIAL_TASKS,
+  INITIAL_SIGNALS,
+  INITIAL_WATCHLIST,
+  INITIAL_WEEKLY_OUTLIERS,
+} from "@/data/mockData";
 import {
   fetchCardsFromDb,
   upsertCardInDb,
@@ -38,6 +49,15 @@ interface ContentContextType {
   addSignal: (signal: Partial<RadarSignal>) => RadarSignal;
   deleteSignal: (id: string) => void;
   promoteSignalToCard: (signalId: string, contentType?: string) => ContentCard;
+  watchlist: WatchlistAccount[];
+  addWatchlistAccount: (account: Omit<WatchlistAccount, "id" | "lastScouted" | "outliersThisWeek">) => boolean;
+  removeWatchlistAccount: (id: string) => void;
+  outliers: WeeklyOutlier[];
+  pushOutlierToBoard: (
+    outlierId: string,
+    customDraft?: { title?: string; body?: string; type?: string }
+  ) => ContentCard;
+  dismissOutlier: (outlierId: string) => void;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
@@ -45,6 +65,8 @@ const ContentContext = createContext<ContentContextType | undefined>(undefined);
 const LOCAL_STORAGE_KEY = "clericlabs_content_cards_v1";
 const TASKS_STORAGE_KEY = "clericlabs_tasks_v1";
 const SIGNALS_STORAGE_KEY = "clericlabs_radar_signals_v1";
+const WATCHLIST_STORAGE_KEY = "clericlabs_radar_watchlist_v1";
+const OUTLIERS_STORAGE_KEY = "clericlabs_radar_outliers_v1";
 
 const getLocalDateStr = (d = new Date()) => {
   const year = d.getFullYear();
@@ -95,6 +117,8 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
   const [cards, setCards] = useState<ContentCard[]>([]);
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [signals, setSignals] = useState<RadarSignal[]>([]);
+  const [watchlist, setWatchlist] = useState<WatchlistAccount[]>([]);
+  const [outliers, setOutliers] = useState<WeeklyOutlier[]>([]);
   const [activeFilter, setActiveFilter] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedWriter, setSelectedWriter] = useState<string>("All Writers");
@@ -134,6 +158,28 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (e) {
       setSignals(INITIAL_SIGNALS);
+    }
+
+    try {
+      const storedWatchlist = localStorage.getItem(WATCHLIST_STORAGE_KEY);
+      if (storedWatchlist !== null) {
+        setWatchlist(JSON.parse(storedWatchlist));
+      } else {
+        setWatchlist(INITIAL_WATCHLIST);
+      }
+    } catch (e) {
+      setWatchlist(INITIAL_WATCHLIST);
+    }
+
+    try {
+      const storedOutliers = localStorage.getItem(OUTLIERS_STORAGE_KEY);
+      if (storedOutliers !== null) {
+        setOutliers(JSON.parse(storedOutliers));
+      } else {
+        setOutliers(INITIAL_WEEKLY_OUTLIERS);
+      }
+    } catch (e) {
+      setOutliers(INITIAL_WEEKLY_OUTLIERS);
     }
 
     setIsLoaded(true);
@@ -180,8 +226,18 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
       } catch (e) {
         console.warn("Could not save signals to localStorage", e);
       }
+      try {
+        localStorage.setItem(WATCHLIST_STORAGE_KEY, JSON.stringify(watchlist));
+      } catch (e) {
+        console.warn("Could not save watchlist to localStorage", e);
+      }
+      try {
+        localStorage.setItem(OUTLIERS_STORAGE_KEY, JSON.stringify(outliers));
+      } catch (e) {
+        console.warn("Could not save outliers to localStorage", e);
+      }
     }
-  }, [cards, tasks, signals, isLoaded]);
+  }, [cards, tasks, signals, watchlist, outliers, isLoaded]);
 
   const updateCardStatus = useCallback((cardId: string, newStatus: string) => {
     setCards((prev) => {
@@ -384,6 +440,77 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
     [signals, addCard]
   );
 
+  const addWatchlistAccount = useCallback(
+    (account: Omit<WatchlistAccount, "id" | "lastScouted" | "outliersThisWeek">) => {
+      if (watchlist.length >= 6) {
+        return false;
+      }
+      const newAcc: WatchlistAccount = {
+        ...account,
+        id: "acc-" + Date.now(),
+        lastScouted: "Just added",
+        outliersThisWeek: 0,
+      };
+      setWatchlist((prev) => [...prev, newAcc]);
+      return true;
+    },
+    [watchlist.length]
+  );
+
+  const removeWatchlistAccount = useCallback((id: string) => {
+    setWatchlist((prev) => prev.filter((a) => a.id !== id));
+  }, []);
+
+  const pushOutlierToBoard = useCallback(
+    (
+      outlierId: string,
+      customDraft?: { title?: string; body?: string; type?: string }
+    ) => {
+      const outlier = outliers.find((o) => o.id === outlierId);
+      const draftTitle =
+        customDraft?.title ||
+        outlier?.rewordedDraft?.title ||
+        outlier?.originalHook ||
+        "Weekly Outlier";
+      const draftBody =
+        customDraft?.body ||
+        outlier?.rewordedDraft?.body ||
+        outlier?.originalBody ||
+        "";
+
+      const defaultType =
+        customDraft?.type ||
+        (outlier?.platform === "x"
+          ? "X / Twitter"
+          : outlier?.platform === "linkedin"
+          ? "LinkedIn"
+          : "IG Carousel");
+
+      const newCard = addCard({
+        title: draftTitle,
+        type: defaultType,
+        status: "Radar",
+        category: outlier?.hookType ? `${outlier.hookType} Hook` : "Mindset & Philosophy",
+        priority: (outlier?.outlierMultiple || 0) >= 8 ? "High" : "Medium",
+        caption: draftBody,
+        slideCopy: draftBody,
+        tags: `radar-outlier, ${outlier?.platform || "social"}, ${outlier?.authorHandle || ""}`,
+        supportingAssetsUrl: outlier?.originalUrl,
+      });
+
+      setOutliers((prev) =>
+        prev.map((o) => (o.id === outlierId ? { ...o, isPromoted: true } : o))
+      );
+
+      return newCard;
+    },
+    [outliers, addCard]
+  );
+
+  const dismissOutlier = useCallback((outlierId: string) => {
+    setOutliers((prev) => prev.filter((o) => o.id !== outlierId));
+  }, []);
+
   return (
     <ContentContext.Provider
       value={{
@@ -414,6 +541,12 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
         addSignal,
         deleteSignal,
         promoteSignalToCard,
+        watchlist,
+        addWatchlistAccount,
+        removeWatchlistAccount,
+        outliers,
+        pushOutlierToBoard,
+        dismissOutlier,
       }}
     >
       {children}

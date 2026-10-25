@@ -53,6 +53,290 @@ export interface RadarSignal {
   isPromoted?: boolean;
 }
 
+export type RadarPlatform = "threads" | "x" | "instagram" | "linkedin";
+
+export interface WatchlistAccount {
+  id: string;
+  handle: string;
+  name: string;
+  platform: RadarPlatform;
+  avatarUrl?: string;
+  followers: string;
+  avgEngagement: number;
+  outliersThisWeek: number;
+  lastScouted: string;
+  category: string;
+}
+
+export interface WeeklyOutlier {
+  id: string;
+  accountId: string;
+  authorHandle: string;
+  authorName: string;
+  platform: RadarPlatform;
+  postedDaysAgo: string;
+  originalHook: string;
+  originalBody: string;
+  hookType: "Contrarian" | "Curiosity Gap" | "Framework" | "Relatable" | "Warning";
+  metrics: {
+    likes: number;
+    reposts: number;
+    comments: number;
+    views?: number;
+  };
+  baselineEngagement: number;
+  outlierMultiple: number; // e.g. 8.4 = 8.4x median weekly baseline
+  originalUrl?: string;
+  suggestedHooks: { label: string; text: string }[];
+  rewordedDraft: {
+    title: string;
+    body: string;
+    angle: string;
+  };
+  isPromoted?: boolean;
+}
+
+export const INITIAL_WATCHLIST: WatchlistAccount[] = [
+  {
+    id: "acc-1",
+    handle: "@behavioral_models",
+    name: "Behavioral Models",
+    platform: "threads",
+    followers: "142K",
+    avgEngagement: 320,
+    outliersThisWeek: 2,
+    lastScouted: "18m ago",
+    category: "Psychology & Decision Making",
+  },
+  {
+    id: "acc-2",
+    handle: "@growth_instincts",
+    name: "Growth Instincts",
+    platform: "x",
+    followers: "89K",
+    avgEngagement: 190,
+    outliersThisWeek: 3,
+    lastScouted: "42m ago",
+    category: "Agency OS & High Leverage",
+  },
+  {
+    id: "acc-3",
+    handle: "@rewrite_minds",
+    name: "Rewrite Minds",
+    platform: "threads",
+    followers: "310K",
+    avgEngagement: 840,
+    outliersThisWeek: 2,
+    lastScouted: "1h ago",
+    category: "Mental Models & Cognitive Reframing",
+  },
+  {
+    id: "acc-4",
+    handle: "@stoic_clarity",
+    name: "Stoic Clarity",
+    platform: "instagram",
+    followers: "520K",
+    avgEngagement: 1400,
+    outliersThisWeek: 1,
+    lastScouted: "2h ago",
+    category: "Applied Philosophy & Focus",
+  },
+  {
+    id: "acc-5",
+    handle: "@founder_protocols",
+    name: "Founder Protocols",
+    platform: "linkedin",
+    followers: "64K",
+    avgEngagement: 210,
+    outliersThisWeek: 2,
+    lastScouted: "3h ago",
+    category: "Systems & Leadership",
+  },
+];
+
+export const INITIAL_WEEKLY_OUTLIERS: WeeklyOutlier[] = [
+  {
+    id: "outlier-1",
+    accountId: "acc-1",
+    authorHandle: "@behavioral_models",
+    authorName: "Behavioral Models",
+    platform: "threads",
+    postedDaysAgo: "2 days ago",
+    originalHook: "Most people think procrastination is a time-management flaw. It isn't.",
+    originalBody:
+      "Most people think procrastination is a time-management flaw. It isn't. It's an emotional regulation failure.\n\nYou aren't avoiding the task because you're lazy or unorganized. You are avoiding the negative emotion (inadequacy, boredom, anxiety of judgment) that the task triggers.\n\nThe fix is never a new Pomodoro timer. The fix is lowering the emotional threshold of starting to zero: commit to working for 120 seconds, or write the worst first paragraph possible.",
+    hookType: "Contrarian",
+    metrics: { likes: 3680, reposts: 820, comments: 240 },
+    baselineEngagement: 320,
+    outlierMultiple: 11.5,
+    originalUrl: "https://threads.net",
+    suggestedHooks: [
+      {
+        label: "Contrarian Truth",
+        text: "You don't have a focus problem. You have an emotional avoidance problem.",
+      },
+      {
+        label: "Question Hook",
+        text: "Ever wondered why no to-do list app has ever permanently cured your procrastination?",
+      },
+      {
+        label: "Direct Rule",
+        text: "The 120-Second Deconditioning Rule: How to start hard work without relying on willpower.",
+      },
+    ],
+    rewordedDraft: {
+      title: "The Emotional Avoidance Paradox: Why Willpower Never Cures Procrastination",
+      body:
+        "We spend thousands on calendars, planners, and productivity apps trying to solve what we label a 'scheduling failure.'\n\nIt isn't a scheduling problem. It's a psychological threat reflex.\n\nWhen you open a hard document, your nervous system registers impending judgment. The urge to check your phone isn't distraction—it's emergency relief seeking.\n\nHow high-agency thinkers break the loop:\n1. Separate the outcome from your identity.\n2. Apply the 'Zero Quality' rule for the first 3 minutes.\n3. Make starting smaller than your pride.\n\nOnce motion begins, the threat dissolves.",
+      angle: "Rewrite Minds / Cognitive Reframing",
+    },
+  },
+  {
+    id: "outlier-2",
+    accountId: "acc-2",
+    authorHandle: "@growth_instincts",
+    authorName: "Growth Instincts",
+    platform: "x",
+    postedDaysAgo: "3 days ago",
+    originalHook: "The single biggest leverage in 2026 isn't AI wrappers. It's proprietary distribution.",
+    originalBody:
+      "The single biggest leverage in 2026 isn't AI wrappers. It's proprietary distribution.\n\nEveryone has access to the exact same frontier models. Tech commoditization is happening in weeks, not decades.\n\nIf your agency doesn't own an audience or an automated outbound intelligence loop, you are competing on price until margin hits zero.\n\nBuild the media engine before you build the tool.",
+    hookType: "Warning",
+    metrics: { likes: 1620, reposts: 390, comments: 115 },
+    baselineEngagement: 190,
+    outlierMultiple: 8.5,
+    originalUrl: "https://x.com",
+    suggestedHooks: [
+      {
+        label: "Market Warning",
+        text: "If your moat is 'we use AI', you don't have a business. You have a ticking clock.",
+      },
+      {
+        label: "Asymmetric Take",
+        text: "Why media agencies with their own distribution will acquire SaaS companies in 2026.",
+      },
+      {
+        label: "Framework",
+        text: "The 3 Moats of the 2026 Agency OS: Attention, Custom Data, and Zero-Friction Operations.",
+      },
+    ],
+    rewordedDraft: {
+      title: "The Death of the Feature Moat: Why Distribution Is The Only Defense",
+      body:
+        "Frontier models are now table stakes. Anyone with an API key can replicate your core service in a weekend.\n\nSo what separates agencies charging $25k/mo retainers from those begging for $1k gigs?\n\nProprietary attention and upstream intelligence.\n\nWhen you build an inbound media machine, you stop pitching and start selecting. Distribution isn't marketing—it is the entire economic engine.",
+      angle: "Clericlabs Agency Systems & Leverage",
+    },
+  },
+  {
+    id: "outlier-3",
+    accountId: "acc-3",
+    authorHandle: "@rewrite_minds",
+    authorName: "Rewrite Minds",
+    platform: "threads",
+    postedDaysAgo: "1 day ago",
+    originalHook: "High conviction isn't born from confidence. It's born from eliminating consensus.",
+    originalBody:
+      "High conviction isn't born from confidence. It's born from eliminating consensus.\n\nThe moment you ask 5 people for their opinion on your next move, you average out your intuition to whatever is socially acceptable.\n\nGreat work comes from asymmetric bets that look irresponsible to the median observer until they succeed.",
+    hookType: "Contrarian",
+    metrics: { likes: 5890, reposts: 1410, comments: 310 },
+    baselineEngagement: 840,
+    outlierMultiple: 7.0,
+    originalUrl: "https://threads.net",
+    suggestedHooks: [
+      {
+        label: "Contrarian Principle",
+        text: "Seeking consensus is just fear disguised as thoroughness.",
+      },
+      {
+        label: "Observation Hook",
+        text: "Notice how every piece of advice you get from a committee averages out to mediocrity?",
+      },
+      {
+        label: "Bold Rule",
+        text: "The Rule of Asymmetric Silence: Never ask for feedback from people who don't bear the downside.",
+      },
+    ],
+    rewordedDraft: {
+      title: "The Consensus Trap: Why Asking for Opinions Destroys Great Work",
+      body:
+        "Asking for validation feels responsible. In reality, it is a subtle defense mechanism to diffuse the pain of potential failure.\n\nWhen you poll a room, you don't get truth. You get the lowest common denominator of comfort.\n\nIf an idea requires unanimous approval to launch, it is already too safe to matter.\n\nProtect your initial conviction until you test it against reality, not social opinion.",
+      angle: "Cognitive Autonomy & Unshakeable Conviction",
+    },
+  },
+  {
+    id: "outlier-4",
+    accountId: "acc-4",
+    authorHandle: "@stoic_clarity",
+    authorName: "Stoic Clarity",
+    platform: "instagram",
+    postedDaysAgo: "4 days ago",
+    originalHook: "Seneca wrote this 2,000 years ago, and modern neuroscience just confirmed it:",
+    originalBody:
+      "Seneca wrote this 2,000 years ago, and modern neuroscience just confirmed it:\n\n'We suffer more often in imagination than in reality.'\n\nYour amygdala does not distinguish between a real predator and a simulated catastrophic scenario in your head. It dumps the exact same cortisol.\n\nStop paying the emotional interest on debts you might never owe.",
+    hookType: "Curiosity Gap",
+    metrics: { likes: 9800, reposts: 2900, comments: 420 },
+    baselineEngagement: 1400,
+    outlierMultiple: 7.0,
+    originalUrl: "https://instagram.com",
+    suggestedHooks: [
+      {
+        label: "Ancient vs Modern",
+        text: "Why your brain treats imaginary embarrassment the same as physical danger.",
+      },
+      {
+        label: "Direct Punch",
+        text: "You are exhausting yourself fighting battles that only exist in your head.",
+      },
+      {
+        label: "Stoic Lens",
+        text: "The Cost of Pre-Suffering: How to stop rehearsing disasters.",
+      },
+    ],
+    rewordedDraft: {
+      title: "Pre-Suffering: The Heavy Tax on Simulated Catastrophes",
+      body:
+        "Before a tough conversation or client review, how many hours do you spend rehearsing the worst possible outcome?\n\nEvery rehearsal releases the same neurochemical exhaustion as living through the real event.\n\nMost people live through tragedies twenty times before breakfast—nineteen of which never materialize.\n\nPrepare for what is in your control. Dismiss the imaginary theatre.",
+      angle: "Stoic Psychology & Energy Preservation",
+    },
+  },
+  {
+    id: "outlier-5",
+    accountId: "acc-5",
+    authorHandle: "@founder_protocols",
+    authorName: "Founder Protocols",
+    platform: "linkedin",
+    postedDaysAgo: "5 days ago",
+    originalHook: "Stop asking your team for updates. Implement asynchronous signal logs instead.",
+    originalBody:
+      "Stop asking your team for updates. Implement asynchronous signal logs instead.\n\nDaily standups steal 30 minutes of deep focus from every single engineer and designer.\n\nWe replaced all daily syncs with a 3-line end-of-day bullet:\n1. Shipped today\n2. Blocked by\n3. Priority tomorrow\n\nResult: 40% increase in weekly output and zero meeting fatigue.",
+    hookType: "Framework",
+    metrics: { likes: 1350, reposts: 280, comments: 195 },
+    baselineEngagement: 210,
+    outlierMultiple: 6.4,
+    originalUrl: "https://linkedin.com",
+    suggestedHooks: [
+      {
+        label: "Counter-Intuitive Rule",
+        text: "The fastest way to kill agency momentum is a 30-minute daily standup.",
+      },
+      {
+        label: "System Design",
+        text: "How we killed 15 hours of meetings a week with a 3-line asynchronous protocol.",
+      },
+      {
+        label: "Operator Take",
+        text: "If you need a meeting to know what your team is doing, your dashboard is broken.",
+      },
+    ],
+    rewordedDraft: {
+      title: "The Zero-Meeting Operating Cadence: Eliminating Daily Standup Drag",
+      body:
+        "Meetings are often treated as work. In truth, they are the tax you pay for lack of clear asynchronous signals.\n\nWhen an agency switches from verbal syncs to structured daily telemetry, two things happen:\n1. Accountability becomes visible in writing.\n2. Makers gain 4 uninterrupted hours of deep creative flow.\n\nBuild systems that report status automatically so your people can focus on craftsmanship.",
+      angle: "Clericlabs Operational Architecture",
+    },
+  },
+];
+
 export const INITIAL_SIGNALS: RadarSignal[] = [
   {
     id: "sig-1",
