@@ -4,14 +4,14 @@ import React, { useState } from "react";
 import {
   Flame,
   Sparkles,
-  ExternalLink,
   ChevronDown,
   ChevronUp,
-  Share2,
   Trash2,
   CheckCircle2,
-  ArrowRight,
-  Zap,
+  Send,
+  Heart,
+  Repeat2,
+  MessageSquare,
 } from "lucide-react";
 import { WeeklyOutlier } from "@/data/mockData";
 import { getPlatformMeta } from "./WatchlistShelf";
@@ -36,151 +36,145 @@ export function WeeklyOutlierCard({
   const getHookTypeBadge = (type: WeeklyOutlier["hookType"]) => {
     switch (type) {
       case "Contrarian":
-        return "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20";
+        return "bg-rose-500/10 text-rose-400 border-rose-500/20";
       case "Curiosity Gap":
-        return "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20";
+        return "bg-amber-500/10 text-amber-400 border-amber-500/20";
       case "Framework":
-        return "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20";
+        return "bg-blue-500/10 text-blue-400 border-blue-500/20";
       case "Warning":
-        return "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20";
+        return "bg-orange-500/10 text-orange-400 border-orange-500/20";
       default:
-        return "bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-500/20";
+        return "bg-zinc-500/10 text-zinc-400 border-zinc-500/20";
     }
   };
 
   return (
     <div
-      className={`group bg-white/90 dark:bg-[#131414]/90 backdrop-blur-xl rounded-3xl border transition-all flex flex-col justify-between p-5 shadow-sm hover:shadow-md ${
+      className={`group bg-[#131414] rounded-2xl border transition-all flex flex-col justify-between p-4 sm:p-5 shadow-sm hover:shadow-md ${
         outlier.isPromoted
           ? "border-emerald-500/30 bg-emerald-500/[0.02]"
-          : "border-black/[0.08] dark:border-white/[0.12] hover:border-[#8E4128]/50"
+          : "border-white/[0.08] hover:border-white/[0.16]"
       }`}
     >
-      <div className="space-y-4">
-        {/* Top Meta Bar */}
-        <div className="flex items-center justify-between gap-3">
+      <div className="space-y-3.5">
+        {/* Top Author & Anomaly Badge Row */}
+        <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
             <div
-              className={`w-7 h-7 rounded-xl flex items-center justify-center font-mono font-bold text-xs shrink-0 shadow-2xs ${meta.badgeBg}`}
+              className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-[11px] shrink-0 ${meta.badgeBg}`}
             >
               {meta.icon}
             </div>
             <div className="min-w-0">
-              <div className="text-xs font-bold text-zinc-900 dark:text-[#F5F3EF] truncate flex items-center gap-1.5">
-                <span>{outlier.authorName}</span>
-                <span className="text-[10px] font-mono text-zinc-400 dark:text-[#8A8680]">
-                  {outlier.authorHandle}
-                </span>
+              <div className="text-xs font-semibold text-zinc-100 truncate">
+                {outlier.authorName}
               </div>
-              <div className="text-[10.5px] font-mono text-zinc-400 dark:text-zinc-500">
-                Posted {outlier.postedDaysAgo}
+              <div className="text-[11px] text-zinc-400 truncate">
+                {outlier.authorHandle} • {outlier.postedDaysAgo}
               </div>
             </div>
           </div>
 
-          {/* Outlier Multiple Anomaly Badge */}
-          <div className="flex items-center gap-1.5">
-            <span className="px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-[#8E4128]/15 text-[#8E4128] dark:text-[#C85D3A] border border-[#8E4128]/30 flex items-center gap-1 shadow-2xs">
+          {/* Outlier Badge */}
+          <div className="shrink-0">
+            <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#8E4128]/15 text-[#C85D3A] border border-[#8E4128]/30 flex items-center gap-1 font-mono">
               <Flame className="w-3.5 h-3.5 fill-current" />
-              {outlier.outlierMultiple}x Outlier
+              {outlier.outlierMultiple}x
             </span>
           </div>
         </div>
 
-        {/* Hook Highlight & Body */}
+        {/* Hook Category & Main Copy */}
         <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <span
-              className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${getHookTypeBadge(
-                outlier.hookType
-              )}`}
-            >
-              {outlier.hookType}
-            </span>
-            <span className="text-[10px] font-mono text-zinc-400 dark:text-[#8A8680]">
-              Past 7 Days Spike
-            </span>
-          </div>
+          <span
+            className={`inline-block text-[10px] font-medium px-2 py-0.5 rounded-md border ${getHookTypeBadge(
+              outlier.hookType
+            )}`}
+          >
+            {outlier.hookType}
+          </span>
 
-          {/* Prominent Hook line */}
-          <p className="text-sm font-bold text-zinc-900 dark:text-[#F5F3EF] leading-snug tracking-tight">
-            &ldquo;{outlier.originalHook}&rdquo;
+          {/* Prominent Hook - Clean, Structured Typography without clumsy quotes */}
+          <p className="text-[14px] sm:text-[15px] font-medium text-zinc-100 leading-snug">
+            {outlier.originalHook}
           </p>
 
           {/* Expandable full post */}
           {isExpanded ? (
-            <p className="text-xs text-zinc-600 dark:text-[#8A8680] leading-relaxed whitespace-pre-wrap pt-2 border-t border-black/[0.04] dark:border-white/[0.06] animate-in fade-in duration-150">
+            <p className="text-xs text-zinc-300 leading-relaxed whitespace-pre-wrap pt-2 border-t border-white/[0.06] animate-in fade-in duration-150">
               {outlier.originalBody}
             </p>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setIsExpanded(true)}
-              className="text-[11px] font-mono text-[#8E4128] dark:text-[#C85D3A] hover:underline flex items-center gap-1 cursor-pointer"
-            >
-              <span>Read full original post</span>
-              <ChevronDown className="w-3 h-3" />
-            </button>
-          )}
+          ) : null}
 
-          {isExpanded && (
-            <button
-              type="button"
-              onClick={() => setIsExpanded(false)}
-              className="text-[11px] font-mono text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 flex items-center gap-1 cursor-pointer pt-1"
-            >
-              <span>Show less</span>
+          <button
+            type="button"
+            onClick={() => setIsExpanded((prev) => !prev)}
+            className="text-[11px] text-[#C85D3A] hover:underline flex items-center gap-1 cursor-pointer pt-0.5"
+          >
+            <span>{isExpanded ? "Hide full post" : "Show full post"}</span>
+            {isExpanded ? (
               <ChevronUp className="w-3 h-3" />
-            </button>
-          )}
+            ) : (
+              <ChevronDown className="w-3 h-3" />
+            )}
+          </button>
         </div>
 
-        {/* Engagement Numbers Bar */}
-        <div className="flex items-center justify-between text-[11px] font-mono pt-3 border-t border-black/[0.06] dark:border-white/[0.06] text-zinc-500 dark:text-[#8A8680]">
+        {/* Engagement Metrics with Sleek SVG Icons */}
+        <div className="flex items-center justify-between text-xs text-zinc-400 pt-3 border-t border-white/[0.04]">
           <div className="flex items-center gap-3">
-            <span>❤️ {outlier.metrics.likes.toLocaleString()}</span>
-            <span>🔁 {outlier.metrics.reposts.toLocaleString()}</span>
-            <span>💬 {outlier.metrics.comments.toLocaleString()}</span>
+            <span className="flex items-center gap-1">
+              <Heart className="w-3 h-3 text-zinc-500" />
+              {outlier.metrics.likes.toLocaleString()}
+            </span>
+            <span className="flex items-center gap-1">
+              <Repeat2 className="w-3 h-3 text-zinc-500" />
+              {outlier.metrics.reposts.toLocaleString()}
+            </span>
+            <span className="flex items-center gap-1">
+              <MessageSquare className="w-3 h-3 text-zinc-500" />
+              {outlier.metrics.comments.toLocaleString()}
+            </span>
           </div>
-          <span className="text-[#8E4128] dark:text-[#C85D3A] font-semibold">
-            Baseline: ~{outlier.baselineEngagement}
+          <span className="text-[11px] text-zinc-400">
+            Avg: ~{outlier.baselineEngagement}
           </span>
         </div>
       </div>
 
-      {/* Card Action Footers */}
-      <div className="pt-4 mt-4 border-t border-black/[0.06] dark:border-white/[0.06] flex items-center justify-between gap-2">
+      {/* Footer Actions */}
+      <div className="pt-3.5 mt-3.5 border-t border-white/[0.06] flex items-center justify-between gap-2">
         {outlier.isPromoted ? (
-          <div className="text-[11px] font-mono text-emerald-500 flex items-center gap-1.5 font-bold">
+          <div className="text-xs text-emerald-400 flex items-center gap-1.5 font-medium">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Pushed to Content Board</span>
+            <span>On Board</span>
           </div>
         ) : (
           <button
             type="button"
             onClick={() => onDirectPromote(outlier)}
-            className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer"
+            title="Push to Content Board without editing"
+            className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer flex items-center gap-1"
           >
-            Direct Push →
+            <Send className="w-3 h-3" />
+            <span>Push</span>
           </button>
         )}
 
-        <div className="flex items-center gap-2">
-          {/* Dismiss button */}
+        <div className="flex items-center gap-1.5">
           <button
             type="button"
             onClick={() => dismissOutlier(outlier.id)}
-            title="Dismiss outlier"
-            className="p-1.5 rounded-xl text-zinc-400 hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+            title="Dismiss"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-red-400 hover:bg-white/[0.04] transition-colors cursor-pointer"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
 
-          {/* Primary Action: Reword for Client */}
           <button
             type="button"
             onClick={() => onReword(outlier)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-gradient-to-b from-[#8E4128] to-[#6E2E1A] hover:from-[#9E4A2F] hover:to-[#7E351F] active:scale-95 shadow-xs transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-[#8E4128] hover:bg-[#A34B2F] active:scale-95 transition-all cursor-pointer shadow-xs"
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>Reword for Client</span>
