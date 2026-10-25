@@ -7,6 +7,8 @@ import {
   Trash2,
   Flame,
   X as CloseIcon,
+  RefreshCw,
+  Zap,
 } from "lucide-react";
 import { WatchlistAccount, RadarPlatform } from "@/data/mockData";
 import { useContent } from "@/context/ContentContext";
@@ -40,8 +42,14 @@ export const getPlatformMeta = (platform: RadarPlatform) => {
   }
 };
 
-export function WatchlistShelf() {
-  const { watchlist, addWatchlistAccount, removeWatchlistAccount } = useContent();
+export function WatchlistShelf({ onScanComplete }: { onScanComplete?: (msg: string) => void }) {
+  const {
+    watchlist,
+    addWatchlistAccount,
+    removeWatchlistAccount,
+    scanOutliers,
+    isScanning,
+  } = useContent();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [handle, setHandle] = useState("");
@@ -54,6 +62,15 @@ export function WatchlistShelf() {
   const maxSlots = 6;
   const slotsUsed = watchlist.length;
   const isFull = slotsUsed >= maxSlots;
+
+  const handleScan = async () => {
+    const res = await scanOutliers();
+    if (res.success) {
+      if (onScanComplete) {
+        onScanComplete(`Scanned ${watchlist.length} accounts • Discovered ${res.count} weekly outliers`);
+      }
+    }
+  };
 
   const handleAddSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,16 +116,30 @@ export function WatchlistShelf() {
           </span>
         </div>
 
-        {!isFull && (
+        {/* Header Actions: Scan Button + Add Button */}
+        <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => setIsAddModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-[#8E4128] hover:bg-[#A34B2F] active:scale-95 transition-all cursor-pointer"
+            onClick={handleScan}
+            disabled={isScanning || watchlist.length === 0}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] text-zinc-200 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+            title="Scan accounts for 7-day viral outliers"
           >
-            <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span>Add Account</span>
+            <RefreshCw className={`w-3.5 h-3.5 text-[#C85D3A] ${isScanning ? "animate-spin" : ""}`} />
+            <span>{isScanning ? "Scanning..." : "Scan Accounts"}</span>
           </button>
-        )}
+
+          {!isFull && (
+            <button
+              type="button"
+              onClick={() => setIsAddModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-[#8E4128] hover:bg-[#A34B2F] active:scale-95 transition-all cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Add Account</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Grid of 6 Account Slots */}

@@ -58,6 +58,8 @@ interface ContentContextType {
     customDraft?: { title?: string; body?: string; type?: string }
   ) => ContentCard;
   dismissOutlier: (outlierId: string) => void;
+  isScanning: boolean;
+  scanOutliers: () => Promise<{ success: boolean; count: number; error?: string }>;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
@@ -126,6 +128,7 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [isDbConnected, setIsDbConnected] = useState<boolean>(false);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [isScanning, setIsScanning] = useState<boolean>(false);
 
   // Initial load from LocalStorage first (instant paint) then Supabase
   useEffect(() => {
@@ -511,6 +514,49 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
     setOutliers((prev) => prev.filter((o) => o.id !== outlierId));
   }, []);
 
+  const scanOutliers = useCallback(async () => {
+    setIsScanning(true);
+    try {
+      const res = await fetch("/api/radar/scan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accounts: watchlist }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Scan request failed");
+      }
+
+      const data = await res.json();
+      if (data.success && Array.isArray(data.outliers)) {
+        setOutliers(data.outliers);
+
+        // Update lastScouted time on accounts
+        setWatchlist((prev) =>
+          prev.map((acc) => {
+            const countForAccount = data.outliers.filter(
+              (o: WeeklyOutlier) => o.accountId === acc.id || o.authorHandle === acc.handle
+            ).length;
+            return {
+              ...acc,
+              lastScouted: "Just now",
+              outliersThisWeek: countForAccount || acc.outliersThisWeek,
+            };
+          })
+        );
+
+        return { success: true, count: data.outliersFound };
+      } else {
+        return { success: false, count: 0, error: "Invalid scan response" };
+      }
+    } catch (err: any) {
+      console.error("Scan error:", err);
+      return { success: false, count: 0, error: err.message || "Failed to scan" };
+    } finally {
+      setIsScanning(false);
+    }
+  }, [watchlist]);
+
   return (
     <ContentContext.Provider
       value={{
@@ -547,6 +593,8 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
         outliers,
         pushOutlierToBoard,
         dismissOutlier,
+        isScanning,
+        scanOutliers,
       }}
     >
       {children}

@@ -123,7 +123,12 @@ export default function RadarPage() {
 
         {/* Pillar 1: Monitored Accounts Shelf */}
         <section>
-          <WatchlistShelf />
+          <WatchlistShelf
+            onScanComplete={(msg) => {
+              setToastMessage(msg);
+              setTimeout(() => setToastMessage(null), 4500);
+            }}
+          />
         </section>
 
         {/* Pillar 2: Weekly Outliers Grid */}
