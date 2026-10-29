@@ -96,6 +96,167 @@ export interface WeeklyOutlier {
   isPromoted?: boolean;
 }
 
+export type NicheCategory = "AI News" | "AI Automation";
+
+export interface NicheTrend {
+  id: string;
+  category: NicheCategory;
+  title: string;
+  summary: string;
+  sourceName: string;
+  sourceUrl: string;
+  velocity: string; // e.g. "1.9k points • 420 comments" or "+580% surge"
+  tag: "Breaking Launch" | "Agent Workflow" | "Contrarian Debate" | "Industry Shift";
+  detectedAgo: string;
+  clericlabsAngle: string;
+  suggestedHooks: { label: string; text: string }[];
+  rewordedDraft: {
+    title: string;
+    body: string;
+    angle: string;
+  };
+  isPromoted?: boolean;
+}
+
+export const INITIAL_NICHE_TRENDS: NicheTrend[] = [
+  {
+    id: "trend-1",
+    category: "AI News",
+    title: "Anthropic Releases Claude 3.7 Sonnet with Hybrid Reasoning",
+    summary:
+      "Anthropic rolled out Claude 3.7 Sonnet, introducing hybrid reasoning architecture where users can dynamically toggle between instantaneous token responses and deep multi-step contemplation. Benchmark tests show significant leaps in multi-file codebase refactoring and autonomous debugging.",
+    sourceName: "Hacker News / Anthropic",
+    sourceUrl: "https://news.ycombinator.com",
+    velocity: "2.4k points • 680 comments",
+    tag: "Breaking Launch",
+    detectedAgo: "3 hours ago",
+    clericlabsAngle:
+      "Everyone is obsessing over the benchmark graphs. The real business moat is hybrid thinking: fast answers for customer ops, deep reasoning for complex code and strategy.",
+    suggestedHooks: [
+      {
+        label: "Contrarian Angle",
+        text: "Why benchmark scores lie: The real reason Claude's new hybrid reasoning changes B2B economics.",
+      },
+      {
+        label: "Direct Observation",
+        text: "Anthropic just solved the single biggest complaint about reasoning models: latency.",
+      },
+      {
+        label: "Agency Systems",
+        text: "How we're deploying Claude 3.7 into our agency pipeline to cut production cycles in half.",
+      },
+    ],
+    rewordedDraft: {
+      title: "The Death of the Static Prompt: Why Hybrid Reasoning Changes Agency Leverage",
+      body:
+        "Anthropic just released Claude 3.7 Sonnet with hybrid reasoning.\n\nMost founders will look at the benchmark charts, nod politely, and move on. That is a mistake.\n\nThe breakthrough isn't just higher accuracy—it is variable compute cost. You no longer choose between a dumb, fast model and an expensive, slow reasoning model. You control the cognitive depth per API call.\n\nHow high-leverage agencies are applying this:\n1. Instant tier: Routing customer emails, drafting social hooks, sorting tickets (0 seconds thinking).\n2. Deep tier: Architectural code audit, contract analysis, multi-step market intelligence (60 seconds deep thinking).\n\nDon't build wrappers. Build workflows that dynamically allocate intelligence based on problem complexity.",
+      angle: "Clericlabs Operational Architecture & AI Systems",
+    },
+  },
+  {
+    id: "trend-2",
+    category: "AI Automation",
+    title: "Why Agencies Are Replacing Zapier with Autonomous Browser Agents",
+    summary:
+      "A massive shift is underway as agencies abandon rigid API-only automation tools (Zapier, Make) in favor of headless browser agents (Browser-Use, Playwright AI, Stagehand). These agents can interact with legacy client software, fill web portals, and extract real-time competitor data without waiting for official API integrations.",
+    sourceName: "r/automations • Reddit",
+    sourceUrl: "https://reddit.com/r/automations",
+    velocity: "1.2k upvotes • 310 comments",
+    tag: "Agent Workflow",
+    detectedAgo: "6 hours ago",
+    clericlabsAngle:
+      "APIs are brittle; browser agents are resilient. When a client uses a clunky legacy CRM with no API, you don't say no—you deploy an agent that clicks and types like a human.",
+    suggestedHooks: [
+      {
+        label: "System Warning",
+        text: "If your automation agency relies 100% on Zapier, your margins will hit zero by Q4.",
+      },
+      {
+        label: "The Moat Shift",
+        text: "The new automation hierarchy: APIs for commodities, browser agents for proprietary moats.",
+      },
+      {
+        label: "Framework",
+        text: "How we automated a 4-hour daily manual data entry task without touching an API key.",
+      },
+    ],
+    rewordedDraft: {
+      title: "Beyond Zapier: The Rise of Autonomous Browser-Level Automation",
+      body:
+        "For 8 years, 'automation agency' meant stringing together Zapier zaps and charging a markup.\n\nThat era is officially over. When APIs don't exist—or when enterprise software charges $10k/mo for API access—autonomous browser agents take over.\n\nInstead of waiting for an integration, an agent opens the portal, navigates the UI, downloads the telemetry, and updates your internal system.\n\nThe winners of the 2026 agency economy won't be prompt wrappers. They will be the architects who connect messy human interfaces with structured LLM logic.",
+      angle: "Agency Leverage & Automation Moats",
+    },
+  },
+  {
+    id: "trend-3",
+    category: "AI News",
+    title: "DeepSeek Model Releases Accelerate Local AI Infrastructure Boom",
+    summary:
+      "The release of open-weights reasoning architectures has triggered an unprecedented surge in on-premise and local private AI setups. Companies are realizing they can run 95% frontier performance on private local clusters for a fraction of closed-API token costs.",
+    sourceName: "r/LocalLLaMA • Hacker News",
+    sourceUrl: "https://news.ycombinator.com",
+    velocity: "3.1k points • 890 comments",
+    tag: "Industry Shift",
+    detectedAgo: "14 hours ago",
+    clericlabsAngle:
+      "Data privacy and zero ongoing API costs are turning local models into the enterprise darling. Smart agencies are packaging private local LLM deployments as premium retainers.",
+    suggestedHooks: [
+      {
+        label: "Market Reality",
+        text: "Why enterprise clients are suddenly terrified of sending their data to closed API endpoints.",
+      },
+      {
+        label: "Cost Asymmetry",
+        text: "How one agency cut their $6,000/mo OpenAI bill to $240 using local open weights.",
+      },
+      {
+        label: "Contrarian View",
+        text: "The frontier model moat is evaporating. Your proprietary workflow is the only thing left.",
+      },
+    ],
+    rewordedDraft: {
+      title: "The Token Cost Squeeze: Why Local Models Are Winning Enterprise Trust",
+      body:
+        "Every board of directors has the same two fears regarding AI adoption:\n1. Where does our proprietary client data go?\n2. Why is our API token bill compounding exponentially every month?\n\nThe rise of ultra-efficient open reasoning models completely neutralizes both objections.\n\nWhen you can run high-grade intelligence directly on isolated local infrastructure, AI stops being a variable operational cost and becomes a capitalized permanent asset.\n\nIf you sell services to businesses, stop pitching AI features. Pitch data sovereign automation.",
+      angle: "Enterprise Strategy & AI Sovereignty",
+    },
+  },
+  {
+    id: "trend-4",
+    category: "AI Automation",
+    title: "The Multi-Agent Routing Protocol: Replacing Single Prompts with Teams",
+    summary:
+      "Developers and agencies are moving away from monolithic 'megaprompts' toward lightweight orchestrators with specialized subagents (Researcher, Fact-Checker, Style Editor, Auditor). Testing reveals a 70% decrease in hallucinations and 3x higher code consistency.",
+    sourceName: "GitHub Trending / Tech Community",
+    sourceUrl: "https://github.com",
+    velocity: "+490% star velocity • 1.5k stars",
+    tag: "Contrarian Debate",
+    detectedAgo: "1 day ago",
+    clericlabsAngle:
+      "Never ask one model to do everything. Treat models like junior team members with single distinct responsibilities and an automated review loop.",
+    suggestedHooks: [
+      {
+        label: "Counter-Intuitive Truth",
+        text: "Why a 2,000-word prompt is the worst way to get reliable output from an LLM.",
+      },
+      {
+        label: "System Design",
+        text: "The 3-Agent Assembly Line: How we structure autonomous content quality control.",
+      },
+      {
+        label: "Operator Stance",
+        text: "Single prompts hallucinate; multi-agent review chains compound accuracy.",
+      },
+    ],
+    rewordedDraft: {
+      title: "The End of the Megaprompt: Why Multi-Agent Teams Win Every Time",
+      body:
+        "If your system prompt is 8 pages long and handles context, guidelines, edge cases, and output formatting in one single call, failure is guaranteed.\n\nHumans don't work like that, and neither do neural networks.\n\nWhen we decomposed our content pipeline into 3 distinct micro-agents—one for raw research, one for hook architecture, and one for editorial tone compliance—hallucinations dropped to zero.\n\nQuality in AI automation isn't about finding the magic prompt. It's about designing the handoff between specialized roles.",
+      angle: "Clericlabs Autonomous Workflow Architecture",
+    },
+  },
+];
+
 export const INITIAL_WATCHLIST: WatchlistAccount[] = [
   {
     id: "acc-1",

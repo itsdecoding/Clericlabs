@@ -5,6 +5,8 @@ import Link from "next/link";
 import {
   Sparkles,
   Search,
+  Users,
+  Globe,
 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useContent } from "@/context/ContentContext";
@@ -12,7 +14,9 @@ import { WeeklyOutlier, RadarPlatform } from "@/data/mockData";
 import { WatchlistShelf } from "@/components/radar/WatchlistShelf";
 import { WeeklyOutlierCard } from "@/components/radar/WeeklyOutlierCard";
 import { RewordDrawer } from "@/components/radar/RewordDrawer";
+import { NicheTrendHunter } from "@/components/radar/NicheTrendHunter";
 
+type RadarMode = "competitor" | "niche";
 type PlatformFilter = "all" | RadarPlatform;
 type SortMode = "highest_multiple" | "most_recent";
 
@@ -21,8 +25,10 @@ export default function RadarPage() {
     watchlist,
     outliers,
     pushOutlierToBoard,
+    nicheTrends,
   } = useContent();
 
+  const [radarMode, setRadarMode] = useState<RadarMode>("competitor");
   const [platformFilter, setPlatformFilter] = useState<PlatformFilter>("all");
   const [sortMode, setSortMode] = useState<SortMode>("highest_multiple");
   const [searchQuery, setSearchQuery] = useState("");
@@ -111,109 +117,154 @@ export default function RadarPage() {
           </div>
         )}
 
-        {/* Clean, Non-bloated Page Title */}
-        <div className="space-y-0.5">
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-100">
-            Radar
-          </h1>
-          <p className="text-xs text-zinc-400">
-            {watchlist.length}/6 Monitored Accounts • {outliers.length} Weekly Outliers
-          </p>
-        </div>
-
-        {/* Pillar 1: Monitored Accounts Shelf */}
-        <section>
-          <WatchlistShelf
-            onScanComplete={(msg) => {
-              setToastMessage(msg);
-              setTimeout(() => setToastMessage(null), 4500);
-            }}
-          />
-        </section>
-
-        {/* Pillar 2: Weekly Outliers Grid */}
-        <section className="space-y-3.5">
-          {/* Controls Bar without redundant sentences */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-            <h2 className="text-sm font-semibold text-zinc-100">
-              Weekly Outliers
-            </h2>
-
-            {/* Filter Tabs, Sort, and Search */}
-            <div className="flex flex-wrap items-center gap-2">
-              {/* Platform Selector Tabs */}
-              <div className="flex items-center bg-[#131414] p-1 rounded-xl border border-white/[0.08]">
-                {(
-                  [
-                    { id: "all", label: "All" },
-                    { id: "threads", label: "Threads" },
-                    { id: "x", label: "𝕏" },
-                    { id: "instagram", label: "Instagram" },
-                    { id: "linkedin", label: "LinkedIn" },
-                  ] as { id: PlatformFilter; label: string }[]
-                ).map((tab) => (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setPlatformFilter(tab.id)}
-                    className={`px-3 py-1 text-xs font-medium rounded-lg transition-all cursor-pointer ${
-                      platformFilter === tab.id
-                        ? "bg-[#8E4128] text-white"
-                        : "text-zinc-400 hover:text-zinc-200"
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Sort Mode Dropdown */}
-              <select
-                value={sortMode}
-                onChange={(e) => setSortMode(e.target.value as SortMode)}
-                className="bg-[#131414] border border-white/[0.08] rounded-xl px-2.5 py-1.5 text-xs text-zinc-300 outline-none cursor-pointer"
-              >
-                <option value="highest_multiple">Highest Multiple</option>
-                <option value="most_recent">Most Recent</option>
-              </select>
-
-              {/* Search Bar */}
-              <div className="relative min-w-[160px]">
-                <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search outliers..."
-                  className="w-full bg-[#131414] border border-white/[0.08] rounded-xl pl-8 pr-3 py-1.5 text-xs text-zinc-200 outline-none focus:border-[#8E4128]"
-                />
-              </div>
-            </div>
+        {/* Clean Header & Mode Selector */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="space-y-0.5">
+            <h1 className="text-2xl font-bold tracking-tight text-zinc-100">
+              Radar
+            </h1>
+            <p className="text-xs text-zinc-400">
+              {radarMode === "competitor"
+                ? `${watchlist.length}/6 Monitored Accounts • ${outliers.length} Weekly Outliers`
+                : `${nicheTrends.length} Live Internet Trends in AI News & Automation`}
+            </p>
           </div>
 
-          {/* Outliers Cards Grid */}
-          {filteredOutliers.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {filteredOutliers.map((outlier) => (
-                <WeeklyOutlierCard
-                  key={outlier.id}
-                  outlier={outlier}
-                  onReword={handleOpenReword}
-                  onDirectPromote={handleDirectPromote}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="bg-[#131414] border border-dashed border-white/[0.08] rounded-2xl p-10 text-center space-y-1">
-              <div className="text-xs font-medium text-zinc-400">
-                No weekly outliers match this filter
+          {/* Dual Engine Switcher */}
+          <div className="flex items-center bg-[#131414] p-1 rounded-xl border border-white/[0.08]">
+            <button
+              type="button"
+              onClick={() => setRadarMode("competitor")}
+              className={`px-3.5 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                radarMode === "competitor"
+                  ? "bg-[#8E4128] text-white shadow-xs"
+                  : "text-zinc-400 hover:text-zinc-200"
+              }`}
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>Competitor Outliers</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setRadarMode("niche")}
+              className={`px-3.5 py-1.5 text-xs font-medium rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                radarMode === "niche"
+                  ? "bg-[#8E4128] text-white shadow-xs"
+                  : "text-zinc-400 hover:text-zinc-200"
+              }`}
+            >
+              <Globe className="w-3.5 h-3.5" />
+              <span>Niche Trend Hunter</span>
+            </button>
+          </div>
+        </div>
+
+        {/* ENGINE 1: COMPETITOR OUTLIERS (5-6 Accounts) */}
+        {radarMode === "competitor" && (
+          <div className="space-y-6 animate-in fade-in duration-150">
+            {/* Pillar 1: Monitored Accounts Shelf */}
+            <section>
+              <WatchlistShelf
+                onScanComplete={(msg) => {
+                  setToastMessage(msg);
+                  setTimeout(() => setToastMessage(null), 4500);
+                }}
+              />
+            </section>
+
+            {/* Pillar 2: Weekly Outliers Grid */}
+            <section className="space-y-3.5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                <h2 className="text-sm font-semibold text-zinc-100">
+                  Weekly Outliers
+                </h2>
+
+                {/* Filter Tabs, Sort, and Search */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex items-center bg-[#131414] p-1 rounded-xl border border-white/[0.08]">
+                    {(
+                      [
+                        { id: "all", label: "All" },
+                        { id: "threads", label: "Threads" },
+                        { id: "x", label: "𝕏" },
+                        { id: "instagram", label: "Instagram" },
+                        { id: "linkedin", label: "LinkedIn" },
+                      ] as { id: PlatformFilter; label: string }[]
+                    ).map((tab) => (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setPlatformFilter(tab.id)}
+                        className={`px-3 py-1 text-xs font-medium rounded-lg transition-all cursor-pointer ${
+                          platformFilter === tab.id
+                            ? "bg-[#8E4128] text-white"
+                            : "text-zinc-400 hover:text-zinc-200"
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <select
+                    value={sortMode}
+                    onChange={(e) => setSortMode(e.target.value as SortMode)}
+                    className="bg-[#131414] border border-white/[0.08] rounded-xl px-2.5 py-1.5 text-xs text-zinc-300 outline-none cursor-pointer"
+                  >
+                    <option value="highest_multiple">Highest Multiple</option>
+                    <option value="most_recent">Most Recent</option>
+                  </select>
+
+                  <div className="relative min-w-[160px]">
+                    <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search outliers..."
+                      className="w-full bg-[#131414] border border-white/[0.08] rounded-xl pl-8 pr-3 py-1.5 text-xs text-zinc-200 outline-none focus:border-[#8E4128]"
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
-        </section>
+
+              {filteredOutliers.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {filteredOutliers.map((outlier) => (
+                    <WeeklyOutlierCard
+                      key={outlier.id}
+                      outlier={outlier}
+                      onReword={handleOpenReword}
+                      onDirectPromote={handleDirectPromote}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-[#131414] border border-dashed border-white/[0.08] rounded-2xl p-10 text-center space-y-1">
+                  <div className="text-xs font-medium text-zinc-400">
+                    No weekly outliers match this filter
+                  </div>
+                </div>
+              )}
+            </section>
+          </div>
+        )}
+
+        {/* ENGINE 2: NICHE TREND HUNTER (AI News & AI Automation) */}
+        {radarMode === "niche" && (
+          <div className="animate-in fade-in duration-150">
+            <NicheTrendHunter
+              onNotification={(msg) => {
+                setToastMessage(msg);
+                setTimeout(() => setToastMessage(null), 4500);
+              }}
+            />
+          </div>
+        )}
       </main>
 
-      {/* Pillar 3: Reword for Client Studio Drawer */}
+      {/* Slide-Over Drawer for Competitor Outliers */}
       <RewordDrawer
         outlier={selectedOutlier}
         isOpen={isDrawerOpen}

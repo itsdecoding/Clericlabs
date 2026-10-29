@@ -7,11 +7,13 @@ import {
   RadarSignal,
   WatchlistAccount,
   WeeklyOutlier,
+  NicheTrend,
   INITIAL_CARDS,
   INITIAL_TASKS,
   INITIAL_SIGNALS,
   INITIAL_WATCHLIST,
   INITIAL_WEEKLY_OUTLIERS,
+  INITIAL_NICHE_TRENDS,
 } from "@/data/mockData";
 import {
   fetchCardsFromDb,
@@ -60,6 +62,13 @@ interface ContentContextType {
   dismissOutlier: (outlierId: string) => void;
   isScanning: boolean;
   scanOutliers: () => Promise<{ success: boolean; count: number; error?: string }>;
+  nicheTrends: NicheTrend[];
+  isScanningTrends: boolean;
+  scanNicheTrends: () => Promise<{ success: boolean; count: number; error?: string }>;
+  pushTrendToBoard: (
+    trendId: string,
+    customDraft?: { title?: string; body?: string; type?: string }
+  ) => ContentCard;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
@@ -69,6 +78,7 @@ const TASKS_STORAGE_KEY = "clericlabs_tasks_v1";
 const SIGNALS_STORAGE_KEY = "clericlabs_radar_signals_v1";
 const WATCHLIST_STORAGE_KEY = "clericlabs_radar_watchlist_v1";
 const OUTLIERS_STORAGE_KEY = "clericlabs_radar_outliers_v1";
+const TRENDS_STORAGE_KEY = "clericlabs_radar_niche_trends_v1";
 
 const getLocalDateStr = (d = new Date()) => {
   const year = d.getFullYear();
@@ -121,6 +131,7 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
   const [signals, setSignals] = useState<RadarSignal[]>([]);
   const [watchlist, setWatchlist] = useState<WatchlistAccount[]>([]);
   const [outliers, setOutliers] = useState<WeeklyOutlier[]>([]);
+  const [nicheTrends, setNicheTrends] = useState<NicheTrend[]>([]);
   const [activeFilter, setActiveFilter] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedWriter, setSelectedWriter] = useState<string>("All Writers");
@@ -129,6 +140,7 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
   const [isDbConnected, setIsDbConnected] = useState<boolean>(false);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [isScanning, setIsScanning] = useState<boolean>(false);
+  const [isScanningTrends, setIsScanningTrends] = useState<boolean>(false);
 
   // Initial load from LocalStorage first (instant paint) then Supabase
   useEffect(() => {
@@ -185,6 +197,17 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
       setOutliers(INITIAL_WEEKLY_OUTLIERS);
     }
 
+    try {
+      const storedTrends = localStorage.getItem(TRENDS_STORAGE_KEY);
+      if (storedTrends !== null) {
+        setNicheTrends(JSON.parse(storedTrends));
+      } else {
+        setNicheTrends(INITIAL_NICHE_TRENDS);
+      }
+    } catch (e) {
+      setNicheTrends(INITIAL_NICHE_TRENDS);
+    }
+
     setIsLoaded(true);
 
     // Fetch from Supabase
@@ -239,8 +262,13 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
       } catch (e) {
         console.warn("Could not save outliers to localStorage", e);
       }
+      try {
+        localStorage.setItem(TRENDS_STORAGE_KEY, JSON.stringify(nicheTrends));
+      } catch (e) {
+        console.warn("Could not save nicheTrends to localStorage", e);
+      }
     }
-  }, [cards, tasks, signals, watchlist, outliers, isLoaded]);
+  }, [cards, tasks, signals, watchlist, outliers, nicheTrends, isLoaded]);
 
   const updateCardStatus = useCallback((cardId: string, newStatus: string) => {
     setCards((prev) => {
@@ -557,6 +585,67 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
     }
   }, [watchlist]);
 
+  const scanNicheTrends = useCallback(async () => {
+    setIsScanningTrends(true);
+    try {
+      const res = await fetch("/api/radar/trends", {
+        method: "GET",
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to scan internet trends");
+      }
+
+      const data = await res.json();
+      if (data.success && Array.isArray(data.trends)) {
+        setNicheTrends(data.trends);
+        return { success: true, count: data.total || data.trends.length };
+      } else {
+        return { success: false, count: 0, error: "Invalid trend response" };
+      }
+    } catch (err: any) {
+      console.error("Trends scan error:", err);
+      return { success: false, count: 0, error: err.message || "Failed to scan trends" };
+    } finally {
+      setIsScanningTrends(false);
+    }
+  }, []);
+
+  const pushTrendToBoard = useCallback(
+    (
+      trendId: string,
+      customDraft?: { title?: string; body?: string; type?: string }
+    ) => {
+      const trend = nicheTrends.find((t) => t.id === trendId);
+      const title =
+        customDraft?.title || trend?.rewordedDraft?.title || trend?.title || "AI Trend";
+      const body =
+        customDraft?.body ||
+        trend?.rewordedDraft?.body ||
+        trend?.summary ||
+        "";
+
+      const newCard = addCard({
+        title,
+        type: customDraft?.type || "IG Carousel",
+        status: "Radar",
+        category: trend?.category || "AI News",
+        priority: "High",
+        caption: body,
+        slideCopy: body,
+        tags: `radar-trend, ${trend?.category?.toLowerCase().replace(/\s+/g, "-") || "ai"}, ${trend?.tag || ""}`,
+        supportingAssetsUrl: trend?.sourceUrl,
+      });
+
+      setNicheTrends((prev) =>
+        prev.map((t) => (t.id === trendId ? { ...t, isPromoted: true } : t))
+      );
+
+      return newCard;
+    },
+    [nicheTrends, addCard]
+  );
+
   return (
     <ContentContext.Provider
       value={{
@@ -595,6 +684,10 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
         dismissOutlier,
         isScanning,
         scanOutliers,
+        nicheTrends,
+        isScanningTrends,
+        scanNicheTrends,
+        pushTrendToBoard,
       }}
     >
       {children}
