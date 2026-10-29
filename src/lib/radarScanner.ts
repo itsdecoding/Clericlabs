@@ -156,6 +156,52 @@ const REAL_OUTLIER_SEEDS: Array<{
   }>;
 }> = [
   {
+    handle: "@hubermanlab",
+    name: "Andrew Huberman",
+    platform: "threads",
+    posts: [
+      {
+        daysAgo: "1 day ago",
+        hook: "When you die, does the world keep going, or does it stop because you're not there to experience it?",
+        body: "When you die, does the world keep going, or does it stop because you're not there to experience it?\n\nNeuroscience reveals that your perception of reality is an internal simulation constructed by sensory inputs. When perception ceases, the subjective universe terminates with it.\n\nContemplating finitude isn't morbid; it is the ultimate filter for trivial distractions.",
+        likes: 5115,
+        reposts: 1240,
+        comments: 680,
+      },
+      {
+        daysAgo: "3 days ago",
+        hook: "Errors are requisite for most every type of intellectual, behavioral or motor learning.",
+        body: "Errors are requisite for most every type of intellectual, behavioral or motor learning.\n\nWhen you make a mistake, your brain releases epinephrine to heighten alertness and acetylcholine to tag the neural circuits for plastic change during sleep.\n\nFrustration isn't a sign that you are failing; it is the physiological threshold of neuroplasticity opening.",
+        likes: 6246,
+        reposts: 1890,
+        comments: 412,
+      },
+    ],
+  },
+  {
+    handle: "@naval",
+    name: "Naval",
+    platform: "x",
+    posts: [
+      {
+        daysAgo: "2 days ago",
+        hook: "Impatience with actions, patience with results.",
+        body: "Impatience with actions, patience with results.\n\nMost people do the opposite: they delay execution for months, but expect instantaneous returns the moment they launch.\n\nExecute the daily task with fierce urgency today. Compound the asymmetric upside over decades.",
+        likes: 12400,
+        reposts: 3100,
+        comments: 540,
+      },
+      {
+        daysAgo: "4 days ago",
+        hook: "A busy calendar and a busy mind will destroy your ability to create anything great.",
+        body: "A busy calendar and a busy mind will destroy your ability to create anything great.\n\nAll non-linear returns come from deep contemplation, rapid experimentation, and clear judgment.\n\nGuard your empty hours with your life.",
+        likes: 16800,
+        reposts: 4200,
+        comments: 820,
+      },
+    ],
+  },
+  {
     handle: "@behavioral_models",
     name: "Behavioral Models",
     platform: "threads",
